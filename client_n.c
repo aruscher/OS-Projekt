@@ -79,6 +79,7 @@ int main(int argc, char *argv[ ]){
 	while(run){
 		int option;
 		option = printMainMenu();
+        message[0] = option;
 		//printf(">");
 		//scanf("%s",&message);
 		send(sock,message,strlen(message),0);

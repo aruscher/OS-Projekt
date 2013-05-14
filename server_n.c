@@ -109,17 +109,10 @@ int main(int argc, char *argv[ ]){
 		send(new_fd,message,strlen(message),0);
 		while(1){
 			char buf[MAXDATASIZE];
-			int test;
 			recieve = recv(new_fd,buf,MAXDATASIZE-1,0);
 			buf[recieve]= '\0';
 			printf("RECIVE: %s \n",buf);
-			send(new_fd,"ACK",strlen("ACK"),0);
-
-			if(test == 1){
-				printf("1");			
-			}
-
-			
+			send(new_fd,"ACK",strlen("ACK"),0);		
 		}
 	}
 	exit(0);
