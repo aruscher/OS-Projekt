@@ -8,17 +8,13 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-
-
 // the port client will be connecting to
 #define MYPORT 3490
 
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
-char printMainMenu(){
-	int option;
-	int i = 1;
+void showMainMenu(){
 	printf("Menu\n----\n");
 	printf("1)Student anlegen\n");
 	printf("2)Student finden\n");
@@ -26,15 +22,27 @@ char printMainMenu(){
 	printf("4)Gruppe finden\n");
 	printf("5)Beenden\n");
 	printf("---------------\n");
+	printf("Bitte Nummer eingeben:\n >");
+}
+
+void exitProgramm(){
+	exit(0);
+}
+char printMainMenu(){
+	int option;
+	int i = 1;
+	showMainMenu();
 
 	while(i==1){
-		printf("Bitte Nummer eingeben:");
 		scanf("%i",&option);
 		switch(option){
+			case 0: printf("\n");showMainMenu();break;
 			case 1: return '1';
 			case 2: return '2';
 			case 3: return '3';
 			case 4: return '4';
+			case 5: exitProgramm(); break;
+			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
 	
 	}
