@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -8,6 +7,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+
 
 
 // the port client will be connecting to
@@ -77,8 +77,10 @@ int main(int argc, char *argv[ ]){
 	int run = 1;
 	char message[MAXDATASIZE];
 	while(run){
-		printf(">");
-		scanf("%s",&message);
+		int option;
+		option = printMainMenu();
+		//printf(">");
+		//scanf("%s",&message);
 		send(sock,message,strlen(message),0);
 		recieve = recv(sock,buf,MAXDATASIZE-1,0);
 		buf[recieve]= '\0';
@@ -87,11 +89,25 @@ int main(int argc, char *argv[ ]){
 	return 0;
 }
 
-int printMenu(){
+int printMainMenu(){
+	int option;
+	int i = 1;
 	printf("Menu\n----\n");
-	printf("1)Student");
+	printf("1)Student anlegen\n");
+	printf("2)Student finden\n");
+	printf("3)Gruppe anlegen\n");
+	printf("4)Gruppe finden\n");
+	printf("5)Beenden\n");
+	printf("---------------\n");
 
-
-
+	while(i==1){
+		printf("Bitte Nummer eingeben:");
+		scanf("%i",&option);
+		if(option==1 ||option==2 ||option==3 ||option==4 ||option==5 ){
+			return option;
+		} else {
+			printf("Ungültige Eingabe\n");
+		} 
+	}
 }
 
