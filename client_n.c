@@ -16,6 +16,31 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
+char printMainMenu(){
+	int option;
+	int i = 1;
+	printf("Menu\n----\n");
+	printf("1)Student anlegen\n");
+	printf("2)Student finden\n");
+	printf("3)Gruppe anlegen\n");
+	printf("4)Gruppe finden\n");
+	printf("5)Beenden\n");
+	printf("---------------\n");
+
+	while(i==1){
+		printf("Bitte Nummer eingeben:");
+		scanf("%i",&option);
+		switch(option){
+			case 1: return '1';
+			case 2: return '2';
+			case 3: return '3';
+			case 4: return '4';
+		}
+	
+	}
+	return '9';
+}
+
 int main(int argc, char *argv[ ]){
 	char buf[MAXDATASIZE];
 
@@ -77,9 +102,8 @@ int main(int argc, char *argv[ ]){
 	int run = 1;
 	char message[MAXDATASIZE];
 	while(run){
-		int option;
-		option = printMainMenu();
-        message[0] = option;
+		char option = printMainMenu();
+       		message[0] = option;
 		//printf(">");
 		//scanf("%s",&message);
 		send(sock,message,strlen(message),0);
@@ -90,25 +114,4 @@ int main(int argc, char *argv[ ]){
 	return 0;
 }
 
-int printMainMenu(){
-	int option;
-	int i = 1;
-	printf("Menu\n----\n");
-	printf("1)Student anlegen\n");
-	printf("2)Student finden\n");
-	printf("3)Gruppe anlegen\n");
-	printf("4)Gruppe finden\n");
-	printf("5)Beenden\n");
-	printf("---------------\n");
-
-	while(i==1){
-		printf("Bitte Nummer eingeben:");
-		scanf("%i",&option);
-		if(option==1 ||option==2 ||option==3 ||option==4 ||option==5 ){
-			return option;
-		} else {
-			printf("Ungültige Eingabe\n");
-		} 
-	}
-}
 
