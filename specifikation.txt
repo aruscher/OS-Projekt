@@ -7,11 +7,16 @@ Student
 
 Lehrveranstaltung
 ----------------
-?
+-Bezeichnung (20)
+-Bewertung (X.X => 3)
 
 
 Gruppen
 ------
 -ITTI
 -Informatik
--?
+-Sonstiges
+
+*Jede Gruppe ist eine einzelne csv Datei
+*Jede Zeile in einer csv Datei ist ein Student:
+*MNR;Passwort;Vorname;Nachname;BDay;Fach1;Note1;Fach2;Note2;Fach3;Note3
