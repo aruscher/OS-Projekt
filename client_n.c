@@ -26,10 +26,46 @@ void showMainMenu(){
 }
 
 void createStudent(){
-    printf("Student anlegen");
-    printf("---------------");
-    printf("0 für Beenden");
-    
+    printf("Student anlegen\n");
+    printf("---------------\n");
+    printf("0 für Beenden\n");
+    char vorname[20];
+    char nachname[20];
+    char mNr[9];
+    char bday[10];
+
+
+    printf("Vorname (max.20): >");
+    scanf("%s",vorname);
+    vorname[20]='\0';
+    if(strcmp(vorname,"0")==0){
+        printf("BEENDEN");
+    }
+
+    printf("Nachname (max.20): >");
+    scanf("%s",nachname);
+    nachname[20]='\0';
+    if(strcmp(nachname,"0")==0){
+        printf("BEENDEN");
+    }
+
+    printf("Matrikelnummer (max.9): >");
+    scanf("%s",mNr);
+    mNr[9]='\0';
+    if(strcmp(mNr,"0")==0){
+        printf("BEENDEN");
+    }
+
+    printf("Geburtsta (dd.mm.yyyy): >");
+    scanf("%s",bday); 
+    bday[10]='\0';
+    if(strcmp(bday,"0")==0){
+        printf("BEENDEN");
+    }
+
+    printf("#############################\n");
+    printf("Zusammenfassung:\n");
+    printf("%s %s, Mnr: %s, Geb.: %s",&vorname,&nachname,&mNr,&bday);
 }
 
 void exitProgramm(){
@@ -44,7 +80,7 @@ char printMainMenu(){
 		scanf("%i",&option);
 		switch(option){
 			case 0: printf("\n");showMainMenu();break;
-			case 1: return '1';
+			case 1: createStudent();return '1';
 			case 2: return '2';
 			case 3: return '3';
 			case 4: return '4';
