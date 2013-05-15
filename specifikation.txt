@@ -1,0 +1,17 @@
+Student
+-------
+-Vorname (20)
+-Nachname (20)
+-Matrikelnummer (9)
+-Geburtsdatum (dd.mm.yyyy => 10)
+
+Lehrveranstaltung
+----------------
+?
+
+
+Gruppen
+------
+-ITTI
+-Informatik
+-?

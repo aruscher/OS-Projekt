@@ -25,6 +25,13 @@ void showMainMenu(){
 	printf("Bitte Nummer eingeben:\n >");
 }
 
+void createStudent(){
+    printf("Student anlegen");
+    printf("---------------");
+    printf("0 für Beenden");
+    
+}
+
 void exitProgramm(){
 	exit(0);
 }

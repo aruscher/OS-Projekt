@@ -49,7 +49,8 @@ int main(int argc, char *argv[ ]){
 		printf("SOCKET Creation successfull\n");
 	}
 	
-	/* SOL_SOCKET -> request to socket layer, SO_REUSEADDR -> socketadress can reused */
+	/* SOL_SOCKET -> request to socket layer, 
+     * SO_REUSEADDR -> socketadress can reused */
 	/* checks for mistakes on socket creation */
 	if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) ==-1){
 		perror("CANT CONF SOCKET");
