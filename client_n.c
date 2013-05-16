@@ -36,16 +36,14 @@ void createStudent(int socket){
     char vorname[23];
     char nachname[23];
     char mNr[11];
-    char bday[12];
-
+    char bday[10];
+    char auswahl[1];
 
     printf("Vorname (max.20): >");
     scanf("%s",&vorname);
     if(strcmp(vorname,"0")==0){
         return;
     }
-
-
 
     printf("Nachname (max.20): >");
     scanf("%s",&nachname);
@@ -64,40 +62,28 @@ void createStudent(int socket){
     if(strcmp(bday,"0")==0){
         return;
     }
-
+    char backup[11];
+    strcpy(backup,bday);
     printf("#############################\n");
     printf("Zusammenfassung:\n");
-    printf("%s %s, Mnr: %s, Geb.: %s\n",vorname,nachname,mNr,bday);
+    printf("%s %s, Mnr: %s, Geb.: %s \n",vorname,nachname,mNr,bday);
     printf("Bestätigen(1) Abbruch(0)\n");
-    char auswahl[1];
     printf(">");
     scanf("%s",&auswahl);
     if (strcmp(auswahl,"0")==0){
-        printf("ABBRUCH");
+        return;
     }
-
     char message[MAXDATASIZE];
-    vorname[strlen(vorname)] = ';';
-    vorname[strlen(vorname)+1]='\0';
-    printf("Vorname: %s\n",vorname);
-    nachname[strlen(nachname)] = ';';
-    nachname[strlen(nachname)+1]='\0';
-    printf("Nachname: %s\n",nachname);
-    mNr[strlen(mNr)] = ';';
-    mNr[strlen(mNr)+1]='\0';
-    printf("Mnr: %s\n",mNr);
-    bday[strlen(bday)]=';';
-    bday[strlen(bday)+1]='\0';
-    printf("Bday: %s\n",bday);
-
+    message[0] = '\0';
     strcat(message,vorname);
+    strcat(message,";");
     strcat(message,nachname);
+    strcat(message,";");
     strcat(message,mNr);
-    strcat(message,bday);
-    
+    strcat(message,";");
+    strcat(message,backup);
 
-    printf("Message: %s",message);
-    scanf("%s",&message);
+    sendMsg(socket,message);
 }
 
 void exitProgramm(){
