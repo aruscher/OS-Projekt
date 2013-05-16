@@ -14,6 +14,10 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
+void sendMsg(int socket,char message[MAXDATASIZE]){
+    send(socket,message,strlen(message),0);
+}
+
 void showMainMenu(){
 	printf("Menu\n----\n");
 	printf("1)Student anlegen\n");
@@ -25,53 +29,81 @@ void showMainMenu(){
 	printf("Bitte Nummer eingeben:\n >");
 }
 
-void createStudent(){
+void createStudent(int socket){
     printf("Student anlegen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char vorname[20];
-    char nachname[20];
-    char mNr[9];
-    char bday[10];
+    char vorname[23];
+    char nachname[23];
+    char mNr[11];
+    char bday[12];
 
 
     printf("Vorname (max.20): >");
-    scanf("%s",vorname);
-    vorname[20]='\0';
+    scanf("%s",&vorname);
     if(strcmp(vorname,"0")==0){
-        printf("BEENDEN");
+        return;
     }
 
+
+
     printf("Nachname (max.20): >");
-    scanf("%s",nachname);
-    nachname[20]='\0';
+    scanf("%s",&nachname);
     if(strcmp(nachname,"0")==0){
-        printf("BEENDEN");
+        return;
     }
 
     printf("Matrikelnummer (max.9): >");
-    scanf("%s",mNr);
-    mNr[9]='\0';
+    scanf("%s",&mNr);
     if(strcmp(mNr,"0")==0){
-        printf("BEENDEN");
+        return;
     }
 
     printf("Geburtsta (dd.mm.yyyy): >");
-    scanf("%s",bday); 
-    bday[10]='\0';
+    scanf("%s",&bday); 
     if(strcmp(bday,"0")==0){
-        printf("BEENDEN");
+        return;
     }
 
     printf("#############################\n");
     printf("Zusammenfassung:\n");
-    printf("%s %s, Mnr: %s, Geb.: %s",&vorname,&nachname,&mNr,&bday);
+    printf("%s %s, Mnr: %s, Geb.: %s\n",vorname,nachname,mNr,bday);
+    printf("Bestätigen(1) Abbruch(0)\n");
+    char auswahl[1];
+    printf(">");
+    scanf("%s",&auswahl);
+    if (strcmp(auswahl,"0")==0){
+        printf("ABBRUCH");
+    }
+
+    char message[MAXDATASIZE];
+    vorname[strlen(vorname)] = ';';
+    vorname[strlen(vorname)+1]='\0';
+    printf("Vorname: %s\n",vorname);
+    nachname[strlen(nachname)] = ';';
+    nachname[strlen(nachname)+1]='\0';
+    printf("Nachname: %s\n",nachname);
+    mNr[strlen(mNr)] = ';';
+    mNr[strlen(mNr)+1]='\0';
+    printf("Mnr: %s\n",mNr);
+    bday[strlen(bday)]=';';
+    bday[strlen(bday)+1]='\0';
+    printf("Bday: %s\n",bday);
+
+    strcat(message,vorname);
+    strcat(message,nachname);
+    strcat(message,mNr);
+    strcat(message,bday);
+    
+
+    printf("Message: %s",message);
+    scanf("%s",&message);
 }
 
 void exitProgramm(){
 	exit(0);
 }
-char printMainMenu(){
+char MainMenu(int socket){
 	int option;
 	int i = 1;
 	showMainMenu();
@@ -79,8 +111,8 @@ char printMainMenu(){
 	while(i==1){
 		scanf("%i",&option);
 		switch(option){
-			case 0: printf("\n");showMainMenu();break;
-			case 1: createStudent();return '1';
+			case 0: system("clear");showMainMenu();break;
+			case 1: system("clear");createStudent(socket);return '1';
 			case 2: return '2';
 			case 3: return '3';
 			case 4: return '4';
@@ -153,14 +185,17 @@ int main(int argc, char *argv[ ]){
 	int run = 1;
 	char message[MAXDATASIZE];
 	while(run){
-		char option = printMainMenu();
-       		message[0] = option;
+       // scanf("%s",&message);
+        //sendMsg(sock,message);
+        system("clear");
+		MainMenu(sock);
+    	//message[0] = option;
 		//printf(">");
 		//scanf("%s",&message);
-		send(sock,message,strlen(message),0);
-		recieve = recv(sock,buf,MAXDATASIZE-1,0);
-		buf[recieve]= '\0';
-		printf("RECIVE: %s \n",buf);
+		//send(sock,message,strlen(message),0);
+		//recieve = recv(sock,buf,MAXDATASIZE-1,0);
+		//buf[recieve]= '\0';
+		//printf("RECIVE: %s \n",buf);
 	}
 	return 0;
 }

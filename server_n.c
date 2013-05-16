@@ -19,6 +19,12 @@
 
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
+
+void handleMenu(char rec[MAXDATASIZE]){
+    printf("%s",rec);
+
+}
+
 int main(int argc, char *argv[ ]){
 	/* later used for sock-conf */
 	int yes = 1;
@@ -112,6 +118,7 @@ int main(int argc, char *argv[ ]){
 			char buf[MAXDATASIZE];
 			recieve = recv(new_fd,buf,MAXDATASIZE-1,0);
 			buf[recieve]= '\0';
+            handleMenu(buf);
 			printf("RECIVE: %s \n",buf);
 			send(new_fd,"ACK",strlen("ACK"),0);		
 		}
