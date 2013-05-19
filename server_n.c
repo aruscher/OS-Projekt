@@ -20,10 +20,49 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
-void handleMenu(char rec[MAXDATASIZE]){
-    printf("%s",rec);
-
+char* recMsg(int fd){
+    printf("Waint for msg\n");
+    static char rec[MAXDATASIZE];
+    int msg;
+    msg = recv(fd,rec,MAXDATASIZE-1,0);
+    rec[msg]='\0';
+    printf("recMSG: %s\n",rec);
+    return rec;
 }
+
+int createStudent(int fd){
+    printf("create Student\n");
+    char* student;
+    student = recMsg(fd);
+    printf("StudentRec: %s \n",student);
+    if (strcmp(student,"0")==0){
+        printf("creaate Student Abortet\n");
+    } else {
+        printf("NEED TO WRITE %s TO FILE \n",student);
+    }
+    return 1;
+}
+
+void handleMenu(int fd){
+    char* auswahl;
+    printf("Handle Menu\n");
+    while(1){
+        auswahl = recMsg(fd);
+        if(strcmp(auswahl,"1")==0){
+            createStudent(fd);
+        }
+        if(strcmp(auswahl,"2")==0){
+            printf("2");
+        }
+        if(strcmp(auswahl,"3")==0){
+            printf("3");
+        }
+        if(strcmp(auswahl,"4")==0){
+            printf("4");
+        }
+    }
+}
+
 
 int main(int argc, char *argv[ ]){
 	/* later used for sock-conf */
@@ -103,25 +142,16 @@ int main(int argc, char *argv[ ]){
 	//sa.sa_flags = SA_RESTART;
 
 	/* start accept loop */
-	while(1){
-		int socklen = sizeof(struct sockaddr_in);
-		if((new_fd=accept(sock, (struct sockaddr *)&their_addr, &socklen))==-1){
-			perror("CANT ACCEPT CONNECTION");
-			continue;
-		} else {
-			printf("SOCKET Accept\n");
-		}
+    int socklen = sizeof(struct sockaddr_in);
+    if((new_fd=accept(sock, (struct sockaddr *)&their_addr, &socklen))==-1){
+        perror("CANT ACCEPT CONNECTION");
+        exit(1);
+    } else {
+        printf("SOCKET Accept\n");
+    }
 
-		char *message = "Hello Client, I am ready to work";
-		send(new_fd,message,strlen(message),0);
-		while(1){
-			char buf[MAXDATASIZE];
-			recieve = recv(new_fd,buf,MAXDATASIZE-1,0);
-			buf[recieve]= '\0';
-            handleMenu(buf);
-			printf("RECIVE: %s \n",buf);
-			send(new_fd,"ACK",strlen("ACK"),0);		
-		}
-	}
+    handleMenu(new_fd);
+    
+
 	exit(0);
 }

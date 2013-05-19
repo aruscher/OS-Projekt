@@ -42,24 +42,28 @@ void createStudent(int socket){
     printf("Vorname (max.20): >");
     scanf("%s",&vorname);
     if(strcmp(vorname,"0")==0){
+        sendMsg(socket,"0");
         return;
     }
 
     printf("Nachname (max.20): >");
     scanf("%s",&nachname);
     if(strcmp(nachname,"0")==0){
+        sendMsg(socket,"0");
         return;
     }
 
     printf("Matrikelnummer (max.9): >");
     scanf("%s",&mNr);
     if(strcmp(mNr,"0")==0){
+        sendMsg(socket,"0");
         return;
     }
 
     printf("Geburtsta (dd.mm.yyyy): >");
     scanf("%s",&bday); 
     if(strcmp(bday,"0")==0){
+        sendMsg(socket,"0");
         return;
     }
     char backup[11];
@@ -98,7 +102,7 @@ char MainMenu(int socket){
 		scanf("%i",&option);
 		switch(option){
 			case 0: system("clear");showMainMenu();break;
-			case 1: system("clear");createStudent(socket);return '1';
+			case 1: system("clear");sendMsg(socket,"1");createStudent(socket);return '1';
 			case 2: return '2';
 			case 3: return '3';
 			case 4: return '4';
@@ -164,16 +168,13 @@ int main(int argc, char *argv[ ]){
 	} else {
 		printf("Connected\n");
 	}
-	recieve = recv(sock,buf,MAXDATASIZE-1,0);
-	buf[recieve]= '\0';
-	printf("%s \n",buf);
 
 	int run = 1;
 	char message[MAXDATASIZE];
 	while(run){
        // scanf("%s",&message);
         //sendMsg(sock,message);
-        system("clear");
+        //system("clear");
 		MainMenu(sock);
     	//message[0] = option;
 		//printf(">");
