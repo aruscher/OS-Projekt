@@ -31,6 +31,10 @@ char* recMsg(int fd){
     return rec;
 }
 
+void createGroup(int fd){
+    char* title = recMsg(fd);
+    mkdir(title);
+}
 //FAB
 void newStudent(char* student)
 {
@@ -177,6 +181,7 @@ void handleMenu(int fd){
 		findStudent(fd);
         }
         if(strcmp(auswahl,"3")==0){
+            createGroup(fd);
             printf("3");
         }
         if(strcmp(auswahl,"4")==0){

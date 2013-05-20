@@ -152,6 +152,14 @@ void createStudent(int socket){
     sendMsg(socket,message);
 }
 
+void createGroup(int socket){
+    char title[MAXDATASIZE];
+    printf("Bitte Titel eingeben: >");
+    scanf("%s",&title);
+    sendMsg(socket,title);
+
+}
+
 void exitProgramm(){
 	exit(0);
 }
@@ -166,7 +174,7 @@ char MainMenu(int socket){
 			case 0: system("clear");showMainMenu();break;
 			case 1: system("clear");sendMsg(socket,"1");createStudent(socket);return '1';
 			case 2: system("clear");sendMsg(socket,"2");findStudent(socket);return '2';
-			case 3: system("clear");sendMsg(socket,"3");return '3';
+			case 3: system("clear");sendMsg(socket,"3");createGroup(socket);return '3';
 			case 4: system("clear");sendMsg(socket,"4");return '4';
 			case 5: exitProgramm(); break;
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
