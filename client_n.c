@@ -29,6 +29,52 @@ void showMainMenu(){
 	printf("Bitte Nummer eingeben:\n >");
 }
 
+//FAB
+void findStudent(int socket){
+    printf("Student finden\n");
+    printf("---------------\n");
+    printf("0 für Beenden\n");
+    char mNr[11];
+    char studiengang[20];
+    char auswahl[1];
+
+    printf("Studiengang (max.20): >");
+    scanf("%s",&studiengang);
+    if(strcmp(studiengang,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+
+    printf("Matrikelnummer (max.9): >");
+    scanf("%s",&mNr);
+    if(strcmp(mNr,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+
+    char backupG[20];
+    strcpy(backupG,studiengang);
+    printf("#############################\n");
+    printf("Sie suchen den folgenden Student:\n");
+    printf("Studiengang: %s, Mnr: %s\n",studiengang,mNr);
+    printf("Bestätigen(1) Abbruch(0)\n");
+    printf(">");
+    scanf("%s",&auswahl);
+    if (strcmp(auswahl,"0")==0){
+        return;
+    }
+
+    char message[MAXDATASIZE];
+    message[0] = '\0';
+    strcat(message,backupG);
+    strcat(message,";");
+    strcat(message,mNr);
+
+    printf("Message: %s\n",message);
+    sendMsg(socket,message);
+}
+//Ende FAB
+
 void createStudent(int socket){
     printf("Student anlegen\n");
     printf("---------------\n");
@@ -102,7 +148,7 @@ void createStudent(int socket){
     strcat(message,";");
     strcat(message,backup1);
 
-    printf("Message: %s",message);
+    printf("Message: %s\n",message);
     sendMsg(socket,message);
 }
 
@@ -119,7 +165,7 @@ char MainMenu(int socket){
 		switch(option){
 			case 0: system("clear");showMainMenu();break;
 			case 1: system("clear");sendMsg(socket,"1");createStudent(socket);return '1';
-			case 2: system("clear");sendMsg(socket,"2");return '2';
+			case 2: system("clear");sendMsg(socket,"2");findStudent(socket);return '2';
 			case 3: system("clear");sendMsg(socket,"3");return '3';
 			case 4: system("clear");sendMsg(socket,"4");return '4';
 			case 5: exitProgramm(); break;

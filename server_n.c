@@ -20,6 +20,7 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
+
 char* recMsg(int fd){
     printf("Waint for msg\n");
     static char rec[MAXDATASIZE];
@@ -30,6 +31,125 @@ char* recMsg(int fd){
     return rec;
 }
 
+//FAB
+void newStudent(char* student)
+{
+	/*int input[50];
+	input = seperateCSV(student);*/
+	char seps[]   = ";";
+	char *token;
+	int countSemikolon = 1;
+	int input[50];
+
+   	token = strtok(student, seps);	
+	while (token != NULL)
+	{
+		//save current token
+		input[countSemikolon] = token;		
+      		// Get next token:
+      		token = strtok( NULL, seps );
+
+		countSemikolon++;
+   	}
+
+	if(chdir(input[4]) == -1) //in den Studiengangsordner wechseln, falls vorhanden
+	{
+		printf("Studiengang %s nicht vorhanden\n", input[4]);
+      		//return EXIT_FAILURE;
+   	}
+   	else //vorhanden -> neuen File erstellen
+	{
+		printf("Erfolgreich nach %s gewechselt!\n", input[4]);
+		FILE *newFile = NULL;
+		newFile = fopen(input[3], "w");
+    		if(newFile)
+    		{
+				printf("Student angelegt\n");
+				fprintf(newFile, "%s", student); 
+				//FEHLER: wegen Zerlegung von student hier nur erster Wert in Datei
+		}
+		fclose(newFile);
+	}
+}
+
+int findStudent(int fd)
+{
+	printf("find Student\n");
+    	char* directory;
+    	directory = recMsg(fd);
+	/*int input[50];
+	input = seperateCSV(werte);*/
+	char* student;
+
+	char seps[]   = ";";
+	char *token;
+	int countSemikolon = 1;
+	int input[50];
+
+   	token = strtok(directory, seps);	
+	while (token != NULL)
+	{
+		//save current token
+		input[countSemikolon] = token;		
+      		// Get next token:
+      		token = strtok( NULL, seps );
+
+		countSemikolon++;
+   	}
+
+	// In Gruppen-Verzeichnis wechseln
+   	if(chdir(input[1]) == -1) 
+	{
+		printf("Gruppe nicht vorhanden\n");
+		//return EXIT_FAILURE;
+   	}
+	else
+	{
+		printf("Erfolgreich nach %s gewechselt!\n", input[1]);
+
+		FILE *pFile = NULL;     
+		if( (pFile = fopen(input[2], "r")) == NULL)
+		{
+      			printf("Student kann nicht gefunden werden");
+      			//return EXIT_FAILURE;
+		}
+		/*fgets(student, 20, pFile);
+		printf("%s",student);*/
+		
+		int nRet;
+   		size_t *t = malloc(0);
+   		char **gptr = malloc(sizeof(char*));
+   		*gptr = NULL;
+
+		while( (nRet=getline(gptr, t, pFile)) > 0)
+      		fputs(*gptr,stdout);
+		//TODO: get it in a variable and send it to client
+	}
+	return 2;
+}
+/*
+int seperateCSV(char* student)
+{
+	char seps[]   = ";";
+	char *token;
+	int countSemikolon = 1;
+	int input[50];
+
+   	token = strtok(student, seps);	
+	while (token != NULL)
+	{
+		//save current token
+		input[countSemikolon] = token;		
+      		// Get next token:
+      		token = strtok( NULL, seps );
+
+		countSemikolon++;
+   	}
+	return input;
+}*/
+//Ende FAB
+
+
 int createStudent(int fd){
     printf("create Student\n");
     char* student;
@@ -39,6 +159,7 @@ int createStudent(int fd){
         printf("creaate Student Abortet\n");
     } else {
         printf("NEED TO WRITE %s TO FILE \n",student);
+	newStudent(student);
     }
     return 1;
 }
@@ -52,7 +173,8 @@ void handleMenu(int fd){
             createStudent(fd);
         }
         if(strcmp(auswahl,"2")==0){
-            printf("2");
+		//printf("2");            
+		findStudent(fd);
         }
         if(strcmp(auswahl,"3")==0){
             printf("3");
