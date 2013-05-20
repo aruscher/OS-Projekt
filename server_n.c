@@ -40,6 +40,8 @@ void newStudent(char* student)
 {
 	/*int input[50];
 	input = seperateCSV(student);*/
+    char writeString[MAXDATASIZE];
+    strcpy(writeString,student);
 	char seps[]   = ";";
 	char *token;
 	int countSemikolon = 1;
@@ -69,8 +71,7 @@ void newStudent(char* student)
     		if(newFile)
     		{
 				printf("Student angelegt\n");
-				fprintf(newFile, "%s", student); 
-				//FEHLER: wegen Zerlegung von student hier nur erster Wert in Datei
+				fprintf(newFile, "%s", writeString); 
 		}
 		fclose(newFile);
 	}
