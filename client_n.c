@@ -37,6 +37,7 @@ void createStudent(int socket){
     char nachname[23];
     char mNr[11];
     char bday[10];
+    char studiengang[20];
     char auswahl[1];
 
     printf("Vorname (max.20): >");
@@ -60,23 +61,35 @@ void createStudent(int socket){
         return;
     }
 
-    printf("Geburtsta (dd.mm.yyyy): >");
+    printf("Geburtstag (dd.mm.yyyy): >");
     scanf("%s",&bday); 
     if(strcmp(bday,"0")==0){
         sendMsg(socket,"0");
         return;
     }
-    char backup[11];
-    strcpy(backup,bday);
+
+
+    printf("Studiengang (max.20): >");
+    scanf("%s",&studiengang);
+    if(strcmp(studiengang,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+
+    char backup1[11];
+    char backup2[20];
+    strcpy(backup1,bday);
+    strcpy(backup2,studiengang);
     printf("#############################\n");
     printf("Zusammenfassung:\n");
-    printf("%s %s, Mnr: %s, Geb.: %s \n",vorname,nachname,mNr,bday);
+    printf("%s %s, Mnr: %s, Studiengang: %s, Geb.: %s \n",vorname,nachname,mNr,studiengang,bday);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
     scanf("%s",&auswahl);
     if (strcmp(auswahl,"0")==0){
         return;
     }
+
     char message[MAXDATASIZE];
     message[0] = '\0';
     strcat(message,vorname);
@@ -85,8 +98,11 @@ void createStudent(int socket){
     strcat(message,";");
     strcat(message,mNr);
     strcat(message,";");
-    strcat(message,backup);
+    strcat(message,backup2);
+    strcat(message,";");
+    strcat(message,backup1);
 
+    printf("Message: %s",message);
     sendMsg(socket,message);
 }
 
@@ -103,9 +119,9 @@ char MainMenu(int socket){
 		switch(option){
 			case 0: system("clear");showMainMenu();break;
 			case 1: system("clear");sendMsg(socket,"1");createStudent(socket);return '1';
-			case 2: return '2';
-			case 3: return '3';
-			case 4: return '4';
+			case 2: system("clear");sendMsg(socket,"2");return '2';
+			case 3: system("clear");sendMsg(socket,"3");return '3';
+			case 4: system("clear");sendMsg(socket,"4");return '4';
 			case 5: exitProgramm(); break;
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
