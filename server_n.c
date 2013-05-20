@@ -188,6 +188,9 @@ void handleMenu(int fd){
         if(strcmp(auswahl,"4")==0){
             printf("4");
         }
+        if(strcmp(auswahl,"5")==0){
+            printf("5");
+        }
     }
 }
 

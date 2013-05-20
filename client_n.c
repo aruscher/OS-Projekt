@@ -24,7 +24,8 @@ void showMainMenu(){
 	printf("2)Student finden\n");
 	printf("3)Gruppe anlegen\n");
 	printf("4)Gruppe finden\n");
-	printf("5)Beenden\n");
+    printf("5)Note hinzufügen\n");
+	printf("6)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");
 }
@@ -176,7 +177,8 @@ char MainMenu(int socket){
 			case 2: system("clear");sendMsg(socket,"2");findStudent(socket);return '2';
 			case 3: system("clear");sendMsg(socket,"3");createGroup(socket);return '3';
 			case 4: system("clear");sendMsg(socket,"4");return '4';
-			case 5: exitProgramm(); break;
+			case 5: system("clear");sendMsg(socket,"5");return '5';
+			case 6: exitProgramm(); break;
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
 	
