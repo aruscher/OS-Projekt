@@ -1,14 +1,14 @@
 Student
 -------
--Vorname (20)
--Nachname (20)
--Matrikelnummer (9)
--Geburtsdatum (dd.mm.yyyy => 10)
+-Vorname (21)
+-Nachname (21)
+-Matrikelnummer (10)
+-Studiengang (21)
+-Geburtsdatum (dd.mm.yyyy => 11)
 
 Lehrveranstaltung
 ----------------
--Bezeichnung (20)
--Bewertung (X.X => 3)
+-Bewertung (X.X => 4)
 
 
 Gruppen
@@ -19,4 +19,5 @@ Gruppen
 
 *Jede Gruppe ist eine einzelne csv Datei
 *Jede Zeile in einer csv Datei ist ein Student:
-*MNR;Passwort;Vorname;Nachname;BDay;Fach1;Note1;Fach2;Note2;Fach3;Note3
+*wichtig ist, dass überall ein char freigehalten wird für "/0"
+Vorname;Nachname;MNR;Studiengang;BDay;Note1;Note2;Note3;Note4 etc. (zum schluss kein ";")
