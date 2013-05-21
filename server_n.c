@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <dirent.h>
 
 
 /* the port users will be connecting to */
@@ -228,6 +229,37 @@ int addMark(int fd)
 	}
 }
 
+int findGroup(int fd) {
+
+	printf("find Group\n");
+    	char* directory;
+    	directory = recMsg(fd);
+
+	DIR *dir;
+	struct dirent *dirzeiger;
+
+  	 /* das Verzeichnis öffnen */
+   	if((dir=opendir(directory)) == NULL) 
+	{ printf("Fehler bei opendir\n"); }
+	else
+	{
+		off_t pos;
+
+		printf("Im Studiengang %s sind folgende Studenten:\n", directory);
+   		/* das komplette Verzeichnis auslesen */
+		
+   		while((dirzeiger=readdir(dir)) != NULL)
+      		{	printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); printf("Zeiger:%llu\n",pos); }
+
+		//TODO: auch 2 falsche einträge ("." und "..")
+		// vllt daher: if entry name is a symbolic link, a value is unspecified
+
+   		/* Lesezeiger wieder schließen */
+   		if(closedir(dir) == -1)
+      			printf("Fehler beim Schließen von %s\n", directory);
+	}
+}
+
 /*
 int seperateCSV(char* student)
 {
@@ -374,7 +406,7 @@ void handleMenu(int fd){
             createGroup(fd);
         }
         if(strcmp(auswahl,"4")==0){
-            printf("4");
+            findGroup(fd);
         }
         if(strcmp(auswahl,"5")==0){
             addMark(fd);

@@ -207,6 +207,22 @@ void createStudent(int socket){
     sendMsg(socket,message);
 }
 
+void findGroup(int socket)
+{
+    printf("Gruppe suchen\n");
+    printf("---------------\n");
+    printf("0 für Beenden\n");
+    char title[MAXDATASIZE];
+    printf("Bitte geben Sie den gesuchten Gruppennamen an: >");
+    scanf("%s",&title);
+    if(strcmp(title,"0")==0)
+    {
+        sendMsg(socket,"0");
+        return;
+    }
+    sendMsg(socket,title);
+}
+
 void createGroup(int socket){
     printf("Gruppe anlegen\n");
     printf("---------------\n");
@@ -237,7 +253,7 @@ char MainMenu(int socket){
 			case 1: system("clear");sendMsg(socket,"1");createStudent(socket);return '1';
 			case 2: system("clear");sendMsg(socket,"2");findStudent(socket);return '2';
 			case 3: system("clear");sendMsg(socket,"3");createGroup(socket);return '3';
-			case 4: system("clear");sendMsg(socket,"4");return '4';
+			case 4: system("clear");sendMsg(socket,"4");findGroup(socket);return '4';
 			case 5: system("clear");sendMsg(socket,"5");addMark(socket);return '5';
 			case 6: exitProgramm(); break;
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
