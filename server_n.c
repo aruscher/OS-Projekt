@@ -33,9 +33,12 @@ char* recMsg(int fd){
 
 void createGroup(int fd){
     char* title = recMsg(fd);
+    if(strcmp(title,"0")==0){
+        return;
+    }
     mkdir(title);
 }
-//FAB
+
 void newStudent(char* student)
 {
 	/*int input[50];
@@ -52,9 +55,8 @@ void newStudent(char* student)
 	{
 		//save current token
 		input[countSemikolon] = token;		
-      		// Get next token:
-      		token = strtok( NULL, seps );
-
+        // Get next token:
+        token = strtok( NULL, seps );
 		countSemikolon++;
    	}
 

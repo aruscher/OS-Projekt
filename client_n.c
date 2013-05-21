@@ -154,9 +154,16 @@ void createStudent(int socket){
 }
 
 void createGroup(int socket){
+    printf("Gruppe anlegen\n");
+    printf("---------------\n");
+    printf("0 für Beenden\n");
     char title[MAXDATASIZE];
     printf("Bitte Titel eingeben: >");
     scanf("%s",&title);
+    if(strcmp(title,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
     sendMsg(socket,title);
 
 }
