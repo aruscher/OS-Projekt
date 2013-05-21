@@ -126,7 +126,7 @@ int findStudent(int fd)
 		printf("Erfolgreich nach %s gewechselt!\n", input[1]);
 
 		FILE *pFile = NULL;     
-		if( (pFile = fopen(input[2], "r")) == NULL)
+		if( (pFile = fopen(input[2], "r")) == NULL) //TODO: wenn nicht vorhanden, erstellt?
 		{
       			printf("Student kann nicht gefunden werden");
       			//return EXIT_FAILURE;
@@ -199,6 +199,7 @@ int addMark(int fd)
 	{
 		printf("Erfolgreich nach %s gewechselt!\n", input[1]);
 
+		//TODO: Wenn Datei nicht vorhanden wird sie im moment erstellt -> darf nicht!
 		FILE *pFile = NULL;     
 		if( (pFile = fopen(input[2], "a")) == NULL)
 		{
@@ -207,8 +208,9 @@ int addMark(int fd)
 		}
 		else
 		{
-			fprintf(pFile, "%s", input[3]); 
+			fprintf(pFile, ";%s", input[3]); 
 			fclose(pFile);
+			printf("Note hinzugefügt");
 		}
 
 		char parentD[200];
