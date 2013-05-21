@@ -35,13 +35,16 @@ void createGroup(int fd){
     char* title = recMsg(fd);
     mkdir(title);
 }
+
 //FAB
-void newStudent(char* student)
+
+//PROBLEM: Wie wird verhindert, dass mehrere Studenten gleiche MNR haben? UserID muss eindeutig sein!
+void newStudent(char* student) 
 {
 	/*int input[50];
 	input = seperateCSV(student);*/
-    char writeString[MAXDATASIZE];
-    strcpy(writeString,student);
+	char writeString[MAXDATASIZE];
+	strcpy(writeString,student);
 	char seps[]   = ";";
 	char *token;
 	int countSemikolon = 1;
@@ -59,10 +62,7 @@ void newStudent(char* student)
    	}
 
 	if(chdir(input[4]) == -1) //in den Studiengangsordner wechseln, falls vorhanden
-	{
-		printf("Studiengang %s nicht vorhanden\n", input[4]);
-      		//return EXIT_FAILURE;
-   	}
+	{ printf("Studiengang %s nicht vorhanden\n", input[4]); }
    	else //vorhanden -> neuen File erstellen
 	{
 		printf("Erfolgreich nach %s gewechselt!\n", input[4]);
@@ -70,10 +70,23 @@ void newStudent(char* student)
 		newFile = fopen(input[3], "w");
     		if(newFile)
     		{
-				printf("Student angelegt\n");
-				fprintf(newFile, "%s", writeString); 
+			printf("Student angelegt\n");
+			fprintf(newFile, "%s", writeString); 
+			fclose(newFile);
 		}
-		fclose(newFile);
+		
+		char parentD[200];
+		if(getcwd(parentD, sizeof(parentD)) == NULL)
+		{
+			printf("Fehler bei getcwd\n");
+		}
+		else
+		{
+			char *h;
+			h = strrchr(parentD, '/');
+			*h = '\0';
+			chdir(parentD);
+		}
 	}
 }
 
@@ -101,7 +114,7 @@ int findStudent(int fd)
 
 		countSemikolon++;
    	}
-
+	
 	// In Gruppen-Verzeichnis wechseln
    	if(chdir(input[1]) == -1) 
 	{
@@ -118,20 +131,101 @@ int findStudent(int fd)
       			printf("Student kann nicht gefunden werden");
       			//return EXIT_FAILURE;
 		}
-		/*fgets(student, 20, pFile);
-		printf("%s",student);*/
-		
-		int nRet;
-   		size_t *t = malloc(0);
-   		char **gptr = malloc(sizeof(char*));
-   		*gptr = NULL;
+		else
+		{
+			/*fgets(student, 20, pFile);
+			printf("%s",student);*/
+			
+			int nRet;
+   			size_t *t = malloc(0);
+   			char **gptr = malloc(sizeof(char*));
+   			*gptr = NULL;
+	
+			while( (nRet=getline(gptr, t, pFile)) > 0)
+      			fputs(*gptr,stdout);
+			//TODO: get it in a variable and send it to client
+			
+			fclose(pFile);
 
-		while( (nRet=getline(gptr, t, pFile)) > 0)
-      		fputs(*gptr,stdout);
-		//TODO: get it in a variable and send it to client
+			char parentD[200];
+			if(getcwd(parentD, sizeof(parentD)) == NULL)
+			{
+				printf("Fehler bei getcwd\n");
+			}
+			else
+			{
+				char *h;
+				h = strrchr(parentD, '/');
+				*h = '\0';
+				chdir(parentD);
+			}
+		}
 	}
 	return 2;
 }
+
+int addMark(int fd)
+{
+	printf("add Mark\n");
+    	char* directory;
+    	directory = recMsg(fd);
+	/*int input[50];
+	input = seperateCSV(werte);*/
+	char* student;
+
+	char seps[]   = ";";
+	char *token;
+	int countSemikolon = 1;
+	int input[50];
+
+   	token = strtok(directory, seps);	
+	while (token != NULL)
+	{
+		//save current token
+		input[countSemikolon] = token;		
+      		// Get next token:
+      		token = strtok( NULL, seps );
+
+		countSemikolon++;
+   	}
+	
+	// In Gruppen-Verzeichnis wechseln
+   	if(chdir(input[1]) == -1) 
+	{
+		printf("Gruppe nicht vorhanden\n");
+		//return EXIT_FAILURE;
+   	}
+	else
+	{
+		printf("Erfolgreich nach %s gewechselt!\n", input[1]);
+
+		FILE *pFile = NULL;     
+		if( (pFile = fopen(input[2], "a")) == NULL)
+		{
+      			printf("Student kann nicht gefunden werden");
+      			//return EXIT_FAILURE;
+		}
+		else
+		{
+			fprintf(pFile, "%s", input[3]); 
+			fclose(pFile);
+		}
+
+		char parentD[200];
+		if(getcwd(parentD, sizeof(parentD)) == NULL)
+		{
+			printf("Fehler bei getcwd\n");
+		}
+		else
+		{
+			char *h;
+			h = strrchr(parentD, '/');
+			*h = '\0';
+			chdir(parentD);
+		}
+	}
+}
+
 /*
 int seperateCSV(char* student)
 {
@@ -177,19 +271,17 @@ void handleMenu(int fd){
         if(strcmp(auswahl,"1")==0){
             createStudent(fd);
         }
-        if(strcmp(auswahl,"2")==0){
-		//printf("2");            
+        if(strcmp(auswahl,"2")==0){           
 		findStudent(fd);
         }
         if(strcmp(auswahl,"3")==0){
             createGroup(fd);
-            printf("3");
         }
         if(strcmp(auswahl,"4")==0){
             printf("4");
         }
         if(strcmp(auswahl,"5")==0){
-            printf("5");
+            addMark(fd);
         }
     }
 }
