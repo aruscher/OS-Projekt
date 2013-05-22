@@ -21,6 +21,21 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
+//0 if not exist, else 1
+int checkStudent(char* mNr){
+    DIR *folder = opendir("./");    
+    struct dirent *dics;
+    struct dirent *file;
+
+    while((dics=readdir(folder))!=NULL){
+        while((file=readdir(folder))!=NULL){
+            if(strcmp(mNr,file->d_name)==0){
+                return 1;
+            }
+        } 
+    }
+    return 0;
+}
 
 char* recMsg(int fd){
     printf("Waint for msg\n");
@@ -127,7 +142,7 @@ int findStudent(int fd)
 		printf("Erfolgreich nach %s gewechselt!\n", input[1]);
 
 		FILE *pFile = NULL;     
-		if( (pFile = fopen(input[2], "r")) == NULL) //TODO: wenn nicht vorhanden, erstellt?
+		if( (pFile = fopen(input[2], "r")) == NULL) //TODO: wenn nicht vorhanden, erstellt? NEIN!<-ar
 		{
       			printf("Student kann nicht gefunden werden");
       			//return EXIT_FAILURE;
