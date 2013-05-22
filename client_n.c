@@ -18,6 +18,18 @@ void sendMsg(int socket,char message[MAXDATASIZE]){
     send(socket,message,strlen(message),0);
 }
 
+char* recMsg(int socket){
+    printf("Waint for msg\n");
+    static char rec[MAXDATASIZE];
+    int msg;
+    msg = recv(socket,rec,MAXDATASIZE-1,0);
+    rec[msg]='\0';
+    printf("recMSG: %s\n",rec);
+    return rec;
+}
+
+
+
 void showMainMenu(){
 	printf("Menu\n----\n");
 	printf("1)Student anlegen\n");

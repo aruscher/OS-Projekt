@@ -39,6 +39,9 @@ int checkStudent(char* mNr){
     return 0;
 }
 */
+void sendMsg(int fd,char message[MAXDATASIZE]){
+    send(fd,message,strlen(message),0);
+}
 
 char* recMsg(int fd){
     printf("Waint for msg\n");
