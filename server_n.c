@@ -21,6 +21,7 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
+/*
 //0 if not exist, else 1
 int checkStudent(char* mNr){
     DIR *folder = opendir("./");    
@@ -28,14 +29,16 @@ int checkStudent(char* mNr){
     struct dirent *file;
 
     while((dics=readdir(folder))!=NULL){
-        while((file=readdir(folder))!=NULL){
+        while((file=readdir(folder->d_name))!=NULL){
             if(strcmp(mNr,file->d_name)==0){
+		 printf("current File: %s",file->d_name);
                 return 1;
             }
         } 
     }
     return 0;
 }
+*/
 
 char* recMsg(int fd){
     printf("Waint for msg\n");
@@ -515,8 +518,6 @@ int findStudent(int fd)
 		{
       			printf("Student kann nicht gefunden werden\n");
       			//return EXIT_FAILURE;
-
-			//TODO:ein Directory höher wieder
 		}
 		else
 		{
@@ -531,7 +532,7 @@ int findStudent(int fd)
 			while( (nRet=getline(gptr, t, pFile)) > 0)
       			fputs(*gptr,stdout);
 			*/
-			//TODO: get it in a variable and send it to client
+			//TODO: send it to client
 			//BEGIN CD
 
 			double notenDurchschnitt = 0.0;
@@ -561,18 +562,18 @@ int findStudent(int fd)
 
 			fclose(pFile);
 
-			char parentD[200];
-			if(getcwd(parentD, sizeof(parentD)) == NULL)
-			{
-				printf("Fehler bei getcwd\n");
-			}
-			else
-			{
-				char *h;
-				h = strrchr(parentD, '/');
-				*h = '\0';
-				chdir(parentD);
-			}
+		}
+		char parentD[200];
+		if(getcwd(parentD, sizeof(parentD)) == NULL)
+		{
+			printf("Fehler bei getcwd\n");
+		}
+		else
+		{
+			char *h;
+			h = strrchr(parentD, '/');
+			*h = '\0';
+			chdir(parentD);
 		}
 	}
 	return 2;
