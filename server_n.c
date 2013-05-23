@@ -53,7 +53,6 @@ int checkStudent(char* mNr){
     return 0;
 }
 
-
 void sendMsg(int fd,char message[MAXDATASIZE]){
     send(fd,message,strlen(message),0);
 }
@@ -81,9 +80,6 @@ void createGroup(int fd){
 	sendMsg(fd,"Gruppe erfolreich erstellt");
 	return;
 }
-
-//FAB
-
 
 double average(char* student)
 {
@@ -125,7 +121,7 @@ double average(char* student)
 	}
 	return -1;
 }
-
+/*
 int newStudent(char* student) 
 {
 	char mnrCounter[9]= "\0";
@@ -187,9 +183,7 @@ int newStudent(char* student)
     		{
 			printf("Student angelegt\n");
 			fprintf(newFile, "%s;%s", mnrCounter,writeString);
-			
-			//sendMsg(fd, "\nStudent wurde erfolgreich erstellt.\nMNR: %s", mnrCounter);
-			//TODO: so einbauen dass es mit fd hinhaut
+
 			fclose(newFile);
 		}
 		
@@ -208,7 +202,7 @@ int newStudent(char* student)
 		return 1;
 	}
 	return -1;
-}
+}*/
 
 int findStudent(int fd)
 {
@@ -299,7 +293,7 @@ int findStudent(int fd)
 				sendMsg(fd, message);
 			} 
 			
-			/*double avg = average(datenStudent); //TODO char** übergeben?
+			/*double avg = average(datenStudent); //TODO char** übergeben? Durchschnitt ausgeben?
 			if(avg == -1)
 			{
 				printf("Keine Noten vorhanden\n");
@@ -352,45 +346,48 @@ int addMark(int fd)
 		countSemikolon++;
    	}
 
+	if(checkStudent(input[2]) == 1)
+	{
+		// In Gruppen-Verzeichnis wechseln
+   		if(chdir(input[1]) == -1) 
+		{
+			printf("Gruppe nicht vorhanden\n");
+			sendMsg(fd, "\nGruppe nicht gefunden.\n");
+   		}
+		else
+		{
+			printf("Erfolgreich nach %s gewechselt!\n", input[1]);
 	
-	// In Gruppen-Verzeichnis wechseln
-   	if(chdir(input[1]) == -1) 
-	{
-		printf("Gruppe nicht vorhanden\n");
-		sendMsg(fd, "\nGruppe nicht gefunden.\n");
-   	}
-	else
-	{
-		printf("Erfolgreich nach %s gewechselt!\n", input[1]);
-
-		//TODO: Wenn Datei nicht vorhanden wird sie im moment erstellt -> darf nicht!
-		FILE *pFile = NULL;     
-		if( (pFile = fopen(input[2], "a")) == NULL)
-		{
-      			printf("Student kann nicht gefunden werden");
-      			sendMsg(fd, "\nStudent wurde nicht gefunden.\n");
-		}
-		else
-		{
-			fprintf(pFile, ";%s", input[3]); 
-			fclose(pFile);
-			printf("Note hinzugefügt");
-			sendMsg(fd, "\nDie Note wurde hinzugefügt.\n");
-		}
-
-		char parentD[200];
-		if(getcwd(parentD, sizeof(parentD)) == NULL)
-		{
-			printf("Fehler bei getcwd\n");
-		}
-		else
-		{
-			char *h;
-			h = strrchr(parentD, '/');
-			*h = '\0';
-			chdir(parentD);
+			FILE *pFile = NULL;     
+			if( (pFile = fopen(input[2], "a")) == NULL)
+			{
+	      			printf("Student kann nicht gefunden werden");
+	      			sendMsg(fd, "\nStudent wurde nicht gefunden.\n");
+			}
+			else
+			{
+				fprintf(pFile, ";%s", input[3]); 
+				fclose(pFile);
+				printf("Note hinzugefügt");
+				sendMsg(fd, "\nDie Note wurde hinzugefügt.\n");
+			}
+	
+			char parentD[200];
+			if(getcwd(parentD, sizeof(parentD)) == NULL)
+			{
+				printf("Fehler bei getcwd\n");
+			}
+			else
+			{
+				char *h;
+				h = strrchr(parentD, '/');
+				*h = '\0';
+				chdir(parentD);
+			}
 		}
 	}
+	else
+	{	sendMsg(fd, "\nStudent existiert nicht.\n");}
 }
 
 int findGroup(int fd) {
@@ -428,20 +425,100 @@ int findGroup(int fd) {
 	}
 }
 
-//Ende FAB
+int createStudent(int fd)
+{
+	printf("create Student\n");
+	char* student;
+	student = recMsg(fd);
+	printf("StudentRec: %s \n",student);
+	if (strcmp(student,"0")==0)
+	{	printf("create Student Abortet\n"); } 
+	else 
+	{	
+		char mnrCounter[9]= "\0";
+		int mnrCounterInt = 0;
 
-int createStudent(int fd){
-    printf("create Student\n");
-    char* student;
-    student = recMsg(fd);
-    printf("StudentRec: %s \n",student);
-    if (strcmp(student,"0")==0){
-        printf("create Student Abortet\n");
-    } else {
-	if(newStudent(student) == -1)
-		sendMsg(fd, "\nFehler bei der Erstellung, bitte erneut versuchen.\n");
-    }
-    return 1;
+		char writeString[MAXDATASIZE];
+		strcpy(writeString,student);
+	
+		char seps[]   = ";";
+		char* token;
+		int countSemikolon = 1;
+		char* input[MAXDATASIZE];
+
+   		token = strtok(student, seps);	
+		while (token != NULL)
+		{
+			//save current token
+			input[countSemikolon] = token;	
+			printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+      			// Get next token:
+      			token = strtok( NULL, seps );
+	
+			countSemikolon++;
+	   	}
+		
+		FILE *mnrFile = NULL;
+		if((mnrFile = fopen("MNR", "r")) == NULL)
+			printf("Fehler1 beim MatrikelCounter");
+		else
+		{
+			fgets(mnrCounter,15,mnrFile);
+			mnrCounterInt = atoi(mnrCounter);
+			mnrCounterInt++;
+			fclose(mnrFile); 
+		}
+	
+		printf("Counter++: %i\n", mnrCounterInt); 
+	
+		if((mnrFile = fopen("MNR", "w")) == NULL)
+			printf("Fehler2 beim MatrikelCounter");
+		else
+		{
+			fprintf(mnrFile, "%i", mnrCounterInt); 
+			fclose(mnrFile);
+		}
+	
+		if(chdir(input[4]) == -1) //in den Studiengangsordner wechseln, falls vorhanden
+		{ printf("Studiengang %s nicht vorhanden\n", input[4]); 
+		sendMsg(fd, "\nDie Gruppe ist nicht vorhanden.\n");}
+	   	else //vorhanden -> neuen File erstellen
+		{
+			printf("Erfolgreich nach %s gewechselt!\n", input[4]);
+			FILE *newFile = NULL;
+			if((newFile = fopen(mnrCounter, "w")) == NULL){
+				perror("fopen");
+				sendMsg(fd, "\nFehler bei der Erstellung, bitte erneut versuchen.\n");
+			}
+			else
+	    		{
+				printf("Student angelegt\n");
+				fprintf(newFile, "%s;%s", mnrCounter,writeString);
+
+				fclose(newFile);
+
+				printf("%s\n", mnrCounter);
+				char message[MAXDATASIZE];
+				sprintf(message, "\nStudent wurde erfolgreich erstellt\nMNR: %s\n", 						mnrCounter);
+			
+				sendMsg(fd, message);
+			}
+			
+			char parentD[200];
+			if(getcwd(parentD, sizeof(parentD)) == NULL)
+			{
+				printf("Fehler bei getcwd\n");
+			}
+			else
+			{
+				char *h;
+				h = strrchr(parentD, '/');
+				*h = '\0';
+				chdir(parentD);
+			}
+		}
+	}
+	return 1;
 }
 
 void handleMenu(int fd){
