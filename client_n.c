@@ -28,8 +28,6 @@ char* recMsg(int socket){
     return rec;
 }
 
-
-
 void showMainMenu(){
 	printf("Menu\n----\n");
 	printf("1)Student anlegen\n");
@@ -247,7 +245,9 @@ void createGroup(int socket){
         return;
     }
     sendMsg(socket,title);
-
+	char* message = recMsg(socket);
+	printf(message);
+	return;
 }
 
 void exitProgramm(){
@@ -262,16 +262,11 @@ char MainMenu(int socket){
 		scanf("%i",&option);
 		switch(option){
 			case 0: system("clear");showMainMenu();break;
-			case 1: system("clear");sendMsg(socket,"1");createStudent(socket);
-				recMsg(socket);return '1';
-			case 2: system("clear");sendMsg(socket,"2");findStudent(socket);
-				recMsg(socket);return '2';
-			case 3: system("clear");sendMsg(socket,"3");createGroup(socket);
-				recMsg(socket);return '3';
-			case 4: system("clear");sendMsg(socket,"4");findGroup(socket);
-				recMsg(socket);return '4';
-			case 5: system("clear");sendMsg(socket,"5");addMark(socket);
-				recMsg(socket);return '5';
+			case 1: system("clear");sendMsg(socket,"1");createStudent(socket);return '1';
+			case 2: system("clear");sendMsg(socket,"2");findStudent(socket);return '2';
+			case 3: system("clear");sendMsg(socket,"3");createGroup(socket);return '3';
+			case 4: system("clear");sendMsg(socket,"4");findGroup(socket);return '4';
+			case 5: system("clear");sendMsg(socket,"5");addMark(socket);return '5';
 			case 6: exitProgramm(); break;
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}

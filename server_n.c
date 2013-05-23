@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <dirent.h>
-
+#include <sys/stat.h>
 
 /* the port users will be connecting to */
 #define MYPORT 3490
@@ -55,7 +55,16 @@ char* recMsg(int fd){
 
 void createGroup(int fd){
     char* title = recMsg(fd);
-    mkdir(title);
+	if(strcmp(title,"0")==0){
+		return;
+	}
+	if(mkdir(title,S_IRWXU|S_IRGRP|S_IXGRP)!=0){
+		perror("mkdir\n");
+		sendMsg(fd,"Gruppe konnte nicht erstellt werden");
+	}
+	printf("Group created\n");
+	sendMsg(fd,"Gruppe erfolreich erstellt");
+	return;
 }
 
 //FAB
@@ -156,6 +165,9 @@ int newStudent(char* student)
 		printf("Erfolgreich nach %s gewechselt!\n", input[4]);
 		FILE *newFile = NULL;
 		newFile = fopen(mnrCounter, "w");
+		if(newFile == NULL){
+			perror("fopen");
+		}
 		printf("MNR ist: %s", mnrCounter);
     		if(newFile)
     		{
