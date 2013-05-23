@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <ctype.h>
 
 // the port client will be connecting to
 #define MYPORT 3490
@@ -32,6 +33,23 @@ char* recMsg(int socket){
 int validStudentInput(char* input){
     if(strchr(input,';')){
             return 0;
+    }
+    return 1;
+}
+
+//1 is valid,0 unvalid
+int validMarkInput(char* input){
+    if(isdigit(input[0])==0){
+        printf("point 0 fail");
+        return 0;
+    }
+    if(isdigit(input[2])==0){
+        printf("point 1 fail");
+        return 0;
+    }
+    if (input[1]!='.'){
+        printf("pointp fail");
+        return 0;
     }
     return 1;
 }
@@ -108,24 +126,28 @@ void addMark(int socket){
         sendMsg(socket,"0");
         return;
     }
-
     printf("Matrikelnummer (max.9): >");
     scanf("%s",&mNr);
     if(strcmp(mNr,"0")==0){
         sendMsg(socket,"0");
         return;
     }
-
     printf("Note (x.y): >");
     scanf("%s/0",&note);
-
+    while(!validMarkInput(note)){
+        printf("Ungülite Eingabe\n");
+        printf("Note (x.y): >");
+        scanf("%s/0",&note);
+    }
     if(strcmp(mNr,"0")==0){
         sendMsg(socket,"0");
         return;
     }
 
     char backupG[20];
+    char backupN[10];
     strcpy(backupG,studiengang);
+    strcpy(backupN,note);
     printf("#############################\n");
     printf("Für Student im Studiengang: %s mit Mnr: %s Note %s hinzufügen\n",studiengang,mNr,note);
     printf("Bestätigen(1) Abbruch(0)\n");
@@ -134,14 +156,14 @@ void addMark(int socket){
     if (strcmp(auswahl,"0")==0){
         return;
     }
-
+    printf("Note %s",note);
     char message[MAXDATASIZE];
     message[0] = '\0';
     strcat(message,backupG);
     strcat(message,";");
     strcat(message,mNr);
     strcat(message,";");
-    strcat(message,note);
+    strcat(message,backupN);
 
     printf("Message: %s\n",message);
     sendMsg(socket,message);
