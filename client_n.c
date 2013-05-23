@@ -257,19 +257,9 @@ void createStudent(int socket){
     }
 
     char message[MAXDATASIZE];
-    message[0] = '\0';
-    strcat(message,passwort);
-    strcat(message,";");
-    strcat(message,vorname);
-    strcat(message,";");
-    strcat(message,nachname);
-    strcat(message,";");
-    strcat(message,backup2);
-    strcat(message,";");
-    strcat(message,backup1);
-    sendMsg(socket,message);
-
-	char* msg;
+    sprintf(message,"%s;%s;%s;%s;%s",passwort,vorname,nachname,backup2,backup1);
+    sendMsg(socket,message);	
+    char* msg;
 	msg = recMsg(socket);
 	printf("%s",msg);
 }
