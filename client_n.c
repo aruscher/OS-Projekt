@@ -28,6 +28,14 @@ char* recMsg(int socket){
     return rec;
 }
 
+//1 is valid, 0 unvalid
+int validStudentInput(char* input){
+    if(strchr(input,';')){
+            return 0;
+    }
+    return 1;
+}
+
 void showMainMenu(){
 	printf("Menu\n----\n");
 	printf("1)Student anlegen\n");
@@ -151,15 +159,13 @@ void createStudent(int socket){
     char studiengang[20];
     char auswahl[1];
 
-    printf("Passwort (max.10): >");
-    scanf("%s",&passwort);
-    if(strcmp(passwort,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }
-
     printf("Vorname (max.20): >");
     scanf("%s",&vorname);
+    while(!validStudentInput(vorname)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Vorname (max.20): >");
+        scanf("%s",&vorname); 
+    }
     if(strcmp(vorname,"0")==0){
         sendMsg(socket,"0");
         return;
@@ -167,6 +173,11 @@ void createStudent(int socket){
 
     printf("Nachname (max.20): >");
     scanf("%s",&nachname);
+    while(!validStudentInput(nachname)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Nachname (max.20): >");
+        scanf("%s",&nachname); 
+    }
     if(strcmp(nachname,"0")==0){
         sendMsg(socket,"0");
         return;
@@ -174,6 +185,11 @@ void createStudent(int socket){
 
     printf("Geburtstag (dd.mm.yyyy): >");
     scanf("%s",&bday); 
+    while(!validStudentInput(bday)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Geburtstag (dd.mm.yyyy): >");
+        scanf("%s",&bday); 
+    }
     if(strcmp(bday,"0")==0){
         sendMsg(socket,"0");
         return;
@@ -182,7 +198,24 @@ void createStudent(int socket){
 
     printf("Studiengang (max.20): >");
     scanf("%s",&studiengang);
+    while(!validStudentInput(studiengang)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Studiengang (max.20): >");
+        scanf("%s",&studiengang); 
+    }
     if(strcmp(studiengang,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+
+    printf("Passwort (max.10): >");
+    scanf("%s",&passwort);
+    while(!validStudentInput(passwort)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Passwort (max.10): >");
+        scanf("%s",&passwort); 
+    }
+    if(strcmp(passwort,"0")==0){
         sendMsg(socket,"0");
         return;
     }
