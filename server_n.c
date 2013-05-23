@@ -21,23 +21,19 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
-/*
+
 //0 if not exist, else 1
 int checkStudent(char* mNr){
-    DIR *folder = opendir("./");    
-    struct dirent *dics;
-    struct dirent *file;
-
-    while((dics=readdir(folder))!=NULL){
-        while((file=readdir(folder->d_name))!=NULL){
-            if(strcmp(mNr,file->d_name)==0){
-		 printf("current File: %s",file->d_name);
-                return 1;
-            }
-        } 
-    }
+    DIR *folder = opendir("./");
+	struct dirent *mainfile;
+	while((mainfile=readdir(folder))!=NULL){
+		printf("Look at file %s",mainfile->d_name);
+	}
+	if(folder==NULL){
+		perror("opendir");
+	}
     return 0;
-}*/
+}
 
 void sendMsg(int fd,char message[MAXDATASIZE]){
     send(fd,message,strlen(message),0);
