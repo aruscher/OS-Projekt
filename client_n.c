@@ -83,6 +83,8 @@ void findStudent(int socket){
 
     printf("Message: %s\n",message);
     sendMsg(socket,message);
+
+    recMsg(socket);
 }
 
 void addMark(int socket){
@@ -137,6 +139,7 @@ void addMark(int socket){
 
     printf("Message: %s\n",message);
     sendMsg(socket,message);
+    recMsg(socket);
 }
 //Ende FAB
 
@@ -214,9 +217,7 @@ void createStudent(int socket){
     strcat(message,backup1);
     sendMsg(socket,message);
 
-	char* msg;
-	msg = recMsg(socket);
-	printf("%s",msg);
+    recMsg(socket);
 }
 
 void findGroup(int socket)
@@ -233,6 +234,7 @@ void findGroup(int socket)
         return;
     }
     sendMsg(socket,title);
+    recMsg(socket);
 }
 
 void createGroup(int socket){
@@ -247,9 +249,7 @@ void createGroup(int socket){
         return;
     }
     sendMsg(socket,title);
-	char* message = recMsg(socket);
-	printf(message);
-	return;
+    recMsg(socket);
 }
 
 void exitProgramm(){

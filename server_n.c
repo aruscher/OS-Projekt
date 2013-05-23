@@ -126,7 +126,6 @@ double average(char* student)
 	return -1;
 }
 
-//PROBLEM: Wie wird verhindert, dass mehrere Studenten gleiche MNR haben? UserID muss eindeutig sein!
 int newStudent(char* student) 
 {
 	char mnrCounter[9]= "\0";
@@ -183,12 +182,14 @@ int newStudent(char* student)
 		if(newFile == NULL){
 			perror("fopen");
 		}
-		printf("MNR ist: %s", mnrCounter);
+		printf("MNR ist: %s/n", mnrCounter);
     		if(newFile)
     		{
 			printf("Student angelegt\n");
 			fprintf(newFile, "%s;%s", mnrCounter,writeString);
-			//fprintf(newFile, "%s",writeString);  
+			
+			//sendMsg(fd, "\nStudent wurde erfolgreich erstellt.\nMNR: %s", mnrCounter);
+			//TODO: so einbauen dass es mit fd hinhaut
 			fclose(newFile);
 		}
 		
@@ -213,16 +214,11 @@ int findStudent(int fd)
 {
 	printf("find Student\n");
 	char* directory;
-    directory = recMsg(fd);
+	directory = recMsg(fd);
 
 	if(strcmp(directory,"0")==0){
-		return;
+		return;//TODO: Fehlerstring an Client?
 	}
-
-	char* student;
-
-	/*char** input;
-	input=seperateCSV(directory);*/
 
 	char seps[]   = ";";
 	char* token;
@@ -240,7 +236,6 @@ int findStudent(int fd)
 
 		countSemikolon++;
    	}
-
 	
 	// In Gruppen-Verzeichnis wechseln
    	if(chdir(input[1]) == -1) 
@@ -253,66 +248,67 @@ int findStudent(int fd)
 		printf("Erfolgreich nach %s gewechselt!\n", input[1]);
 
 		FILE *pFile = NULL;     
-		if( (pFile = fopen(input[2], "r")) == NULL) //TODO: wenn nicht vorhanden, erstellt? NEIN!<-ar
+		if( (pFile = fopen(input[2], "r")) == NULL)
 		{
       			printf("Student kann nicht gefunden werden\n");
       			sendMsg(fd, "\nDer Student konnte nicht gefunden werden.\n");
 		}
 		else
 		{
-			/*fgets(student, 20, pFile);
-			printf("%s",student);
-			
-			int nRet;
-   			size_t *t = malloc(0);
-   			char **gptr = malloc(sizeof(char*));
-   			*gptr = NULL;
-	
-			while( (nRet=getline(gptr, t, pFile)) > 0)
-      			fputs(*gptr,stdout);
-			*/
-			//TODO: send it to client
-
 			char *datenStudent;
 			datenStudent=malloc(500);
 
 			while((fscanf(pFile,"%500s",datenStudent)) != EOF)
 			printf("%s\n",datenStudent);
 			fclose(pFile);
+
+			//char* token2;
+			countSemikolon = 0;
+			char* student[MAXDATASIZE];
+
+   			token = strtok(datenStudent, seps);	
+			while (token != NULL)
+			{
+				countSemikolon++;
+
+				//save current token
+				student[countSemikolon] = token;	
+      				// Get next token:
+      				token = strtok( NULL, seps );
+   			}
+
+			char message[MAXDATASIZE];
+			message[0] = '\0';
+			strcat(message,"\nMNR: ");strcat(message,student[1]);
+			strcat(message,"\nPasswort: ");strcat(message,student[2]);
+			strcat(message,"\nVorname: ");strcat(message,student[3]);
+			strcat(message,"\nName: ");strcat(message,student[4]);
+			strcat(message,"\nGruppe: ");strcat(message,student[5]);
+			strcat(message,"\nGeb: ");strcat(message,student[6]);
+
+			if(countSemikolon < 7)
+				sendMsg(fd, message);
+			else
+			{
+				int i;
+				for(i = 7; i <= countSemikolon; i++)
+				{
+					strcat(message,"\nNote: ");strcat(message,student[i]);
+				}
+				strcat(message,"\n\n");
+				sendMsg(fd, message);
+			} 
 			
-			double avg = average(datenStudent);
+			/*double avg = average(datenStudent); //TODO char** übergeben?
 			if(avg == -1)
+			{
 				printf("Keine Noten vorhanden\n");
-			//else
-
-			sendMsg(fd, "\nStudent wurde gefunden. Zukünftig hier Daten des Studenten.\n");
-			
-//BEGIN CD
-/*
-			double notenDurchschnitt = 0.0;
-
-			char *datenStudent;
-			datenStudent=malloc(500);
-
-			//char datei[10]="123456789";
-
-			FILE *pFile = NULL;
-			//pFile = fopen(datei, "r");
-			pFile = fopen(input[2], "r");
-
-			while((fscanf(pFile,"%500s",datenStudent)) != EOF)
-			printf("%s\n",datenStudent);
-			fclose(pFile);
-			
-			notenDurchschnitt=calcAverage(datenStudent);
-			getVorname(datenStudent);
-			getNachname(datenStudent);
-			getMnr(datenStudent);
-			getStudiengang(datenStudent);
-			getBday(datenStudent);
-			getNoten(datenStudent);*/
-
-			//ENDE CD			
+				sendMsg(fd, "\nStudent wurde gefunden. Zukünftig hier Daten des Studenten.\n");
+			}
+			else
+			{
+				sendMsg(fd, "\nStudent wurde gefunden. Zukünftig hier Daten des Studenten.\n");
+			}*/			
 
 		}
 		char parentD[200];
@@ -442,9 +438,7 @@ int createStudent(int fd){
     if (strcmp(student,"0")==0){
         printf("create Student Abortet\n");
     } else {
-	if(newStudent(student) != -1)
-		sendMsg(fd, "\nStudent wurde erfolgreich erstellt.\n");
-	else
+	if(newStudent(student) == -1)
 		sendMsg(fd, "\nFehler bei der Erstellung, bitte erneut versuchen.\n");
     }
     return 1;
