@@ -57,374 +57,6 @@ void createGroup(int fd){
     char* title = recMsg(fd);
     mkdir(title);
 }
-//BEGIN: CD
-
-
-int countSimi(char* student)
-{
-	char *datenStudent;
-	datenStudent=malloc(500);
-	datenStudent=student;
-
-	char *geradeGelsenesChar;
-	geradeGelsenesChar=malloc(2);
-	int datenAnzahl=1;
-
-	int laenge;
-	laenge = strlen(datenStudent);
-
-    	int i;
-	for(i=0; i<laenge; i++)
-	{
-		if(datenStudent[i]==59)
-		{
-			datenAnzahl++;
-		}
-	}
-	return datenAnzahl;
-}
-
-double calcAverage(char* student)
-{
-	char *datenStudent;
-	datenStudent=malloc(500);
-	datenStudent=student;
-
-	char *notenStudent;
-	notenStudent=malloc(500);
-
-	int datenAnzahl=countSimi(datenStudent);
-
-	char *geradeGelsenesChar;
-	geradeGelsenesChar=malloc(2);
-
-	int naechstesStudentenAttribut=0;
-
-	int laenge = strlen(datenStudent);
-
-    	int i;
-	for(i=0; i<laenge; i++)
-	{
-		if(datenStudent[i]==59)
-		{
-			naechstesStudentenAttribut++;
-		}
-		else
-		{
-			if(naechstesStudentenAttribut > 4)
-			{
-				*geradeGelsenesChar=datenStudent[i];
-				strcat(notenStudent, geradeGelsenesChar);
-			}
-		}
-	}
-	//Ermitteln der Noten
-	int laengeNoten = strlen(notenStudent);
-	char *letzteNote;
-	letzteNote=malloc(500);
-
-	letzteNote[0]='\0';
-	double letzterNotenWert=0.0;
-	double notenSumme = 0.0;
-	double notenDurchschnitt = 0.0;
-	int countTo3=0;
-	
-	naechstesStudentenAttribut = 0;
-
-	for(i=0; i<laengeNoten; i++)
-	{
-		*geradeGelsenesChar=notenStudent[i];
-		//Vergleich auf ASCII-Basis Simikolon => 59 ist ;
-		if(countTo3==3)
-		{
-			printf("%s & ", letzteNote);
-			letzterNotenWert = atof(letzteNote);
-			notenSumme+=letzterNotenWert;
-			letzteNote[0]='\0';
-			countTo3=0;
-		}
-		strcat(letzteNote, geradeGelsenesChar);	
-		countTo3+=1;	
-	}
-	printf("%s", letzteNote);
-	letzterNotenWert = atof(letzteNote);
-	notenSumme+=letzterNotenWert;
-	printf("\nNotenSumme %f\n", notenSumme);
-	notenDurchschnitt= notenSumme/(datenAnzahl-5);
-	notenDurchschnitt = (int)(notenDurchschnitt*10)/10.0;
-	if(laengeNoten==0)
-	{
-		notenDurchschnitt=0.0;
-	}
-	printf("Durchschnitte %f\n",notenDurchschnitt);
-
-	return notenDurchschnitt;
-}
-
-void getNoten(char* student)
-{
-	char *datenStudent;
-	datenStudent=malloc(500);
-	datenStudent=student;
-
-	char *notenStudent;
-	notenStudent=malloc(500);
-
-	int datenAnzahl=countSimi(datenStudent);
-
-	char *geradeGelsenesChar;
-	geradeGelsenesChar=malloc(2);
-
-	int naechstesStudentenAttribut=0;
-
-	int laenge = strlen(datenStudent);
-
-    	int i;
-	//Extrahieren der Noten aus gesamtString
-	for(i=0; i<laenge; i++)
-	{
-		if(datenStudent[i]==59)
-		{
-			naechstesStudentenAttribut++;
-		}
-		else
-		{
-			if(naechstesStudentenAttribut > 4)
-			{
-				*geradeGelsenesChar=datenStudent[i];
-				strcat(notenStudent, geradeGelsenesChar);
-			}
-		}
-	}
-
-	//Ermitteln der Noten
-	int laengeNoten = strlen(notenStudent);
-	char *letzteNote;
-	letzteNote=malloc(500);
-
-	letzteNote[0]='\0';
-	double letzterNotenWert=0.0;
-	int countTo3=0;
-	
-	naechstesStudentenAttribut = 0;
-	printf("Der Student besitzt %i  Noten : ", datenAnzahl-5);
-	for(i=0; i<laengeNoten; i++)
-	{
-		*geradeGelsenesChar=notenStudent[i];
-		//Vergleich auf ASCII-Basis Simikolon => 59 ist ;
-		if(countTo3==3)
-		{
-			printf("%s & ", letzteNote);
-			letzterNotenWert = atof(letzteNote);
-			letzteNote[0]='\0';
-			countTo3=0;
-		}
-		strcat(letzteNote, geradeGelsenesChar);	
-		countTo3+=1;	
-	}
-	printf("%s\n", letzteNote);
-
-	//Varialbe zum Client senden
-}
-
-void getVorname(char* student)
-{
-	char *datenStudent;
-	datenStudent=malloc(500);
-	datenStudent=student;
-
-	char vorname[21];
-	vorname[0]='\0';
-
-	int laenge;
-	int i;
-	char *geradeGelsenesChar;
-	geradeGelsenesChar=malloc(2);
-	int naechstesStudentenAttribut=0;
-	laenge = strlen(datenStudent);
-
-	for(i=0; i<laenge; i++)
-	{
-		if(datenStudent[i]==59)
-		{
-			naechstesStudentenAttribut++;
-		}
-		else
-		{
-			*geradeGelsenesChar=datenStudent[i];
-			switch(naechstesStudentenAttribut) 
-			{
-				case 0:
-					strcat(vorname, geradeGelsenesChar);
-				break;
-			}
-		}
-	}
-	strcat(vorname, "\0");
-	printf("vorname: %s. \n", vorname);
-
-	//Varialbe zum Client senden
-}
-
-void getNachname(char* student)
-{
-	char *datenStudent;
-	datenStudent=malloc(500);
-	datenStudent=student;
-
-	char nachname[21];
-	nachname[0]='\0';
-
-	int laenge;
-	int i;
-	char *geradeGelsenesChar;
-	geradeGelsenesChar=malloc(2);
-	int naechstesStudentenAttribut=0;
-	laenge = strlen(datenStudent);
-
-	for(i=0; i<laenge; i++)
-	{
-		if(datenStudent[i]==59)
-		{
-			naechstesStudentenAttribut++;
-		}
-		else
-		{
-			*geradeGelsenesChar=datenStudent[i];
-			switch(naechstesStudentenAttribut) 
-			{
-				case 1:
-					strcat(nachname, geradeGelsenesChar);
-				break;
-			}
-		}
-	}
-	strcat(nachname, "\0");
-	printf("nachname: %s. \n", nachname);
-
-	//Varialbe zum Client senden
-}
-
-void getMnr(char* student)
-{
-	char *datenStudent;
-	datenStudent=malloc(500);
-	datenStudent=student;
-
-	char mnr[10];
-	mnr[0]='\0';
-
-	int laenge;
-	int i;
-	char *geradeGelsenesChar;
-	geradeGelsenesChar=malloc(2);
-	int naechstesStudentenAttribut=0;
-	laenge = strlen(datenStudent);
-
-	for(i=0; i<laenge; i++)
-	{
-		if(datenStudent[i]==59)
-		{
-			naechstesStudentenAttribut++;
-		}
-		else
-		{
-			*geradeGelsenesChar=datenStudent[i];
-			switch(naechstesStudentenAttribut) 
-			{
-				case 2:
-					strcat(mnr, geradeGelsenesChar);
-				break;
-			}
-		}
-	}
-	strcat(mnr, "\0");
-	printf("MNR: %s. \n", mnr);
-
-	//Varialbe zum Client senden
-}
-
-void getStudiengang(char* student)
-{
-	char *datenStudent;
-	datenStudent=malloc(500);
-	datenStudent=student;
-
-	char studiengang[21];
-	studiengang[0]='\0';
-
-	int laenge;
-	int i;
-	char *geradeGelsenesChar;
-	geradeGelsenesChar=malloc(2);
-	int naechstesStudentenAttribut=0;
-	laenge = strlen(datenStudent);
-
-	for(i=0; i<laenge; i++)
-	{
-		if(datenStudent[i]==59)
-		{
-			naechstesStudentenAttribut++;
-		}
-		else
-		{
-			*geradeGelsenesChar=datenStudent[i];
-			switch(naechstesStudentenAttribut) 
-			{
-				case 3:
-					strcat(studiengang, geradeGelsenesChar);
-				break;
-			}
-		}
-	}
-	strcat(studiengang, "\0");
-	printf("studiengang: %s. \n", studiengang);
-
-	//Varialbe zum Client senden
-}
-
-void getBday(char* student)
-{
-	char *datenStudent;
-	datenStudent=malloc(500);
-	datenStudent=student;
-
-	char bday[21];
-	bday[0]='\0';
-
-	int laenge;
-	int i;
-	char *geradeGelsenesChar;
-	geradeGelsenesChar=malloc(2);
-	int naechstesStudentenAttribut=0;
-	laenge = strlen(datenStudent);
-
-	for(i=0; i<laenge; i++)
-	{
-		if(datenStudent[i]==59)
-		{
-			naechstesStudentenAttribut++;
-		}
-		else
-		{
-			*geradeGelsenesChar=datenStudent[i];
-			switch(naechstesStudentenAttribut) 
-			{
-				case 4:
-					strcat(bday, geradeGelsenesChar);
-				break;
-			}
-		}
-	}
-	strcat(bday, "\0");
-	printf("bday: %s. \n", bday);
-
-	//Varialbe zum Client senden
-}
-
-
-//ENDE: CD
-
 
 //FAB
 
@@ -448,7 +80,7 @@ double average(char* student)
 		//save current token
 		input[countSemikolon] = token;	
 		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
-		if(countSemikolon >5)
+		if(countSemikolon >6)
 		{
 			notenwert = atof(token); //String into Double
 			notenSumme += notenwert;
@@ -457,11 +89,11 @@ double average(char* student)
       		token = strtok( NULL, seps );
    	}
 
-	if(countSemikolon > 5)
+	if(countSemikolon > 6)
 	{
 		//printf("\nNotenAnzahl %i\n", (countSemikolon-5);
 		printf("\nNotenSumme %f\n", notenSumme);
-		notenDurchschnitt = notenSumme/(countSemikolon-5);
+		notenDurchschnitt = notenSumme/(countSemikolon-6);
 		notenDurchschnitt = (int)(notenDurchschnitt*10)/10.0;
 		printf("\nNotenDurchschnitt %f\n", notenDurchschnitt);
 		
@@ -474,7 +106,6 @@ double average(char* student)
 int newStudent(char* student) 
 {
 	char mnrCounter[9]= "\0";
-	//char newMnr[9]= "\0";
 	int mnrCounterInt = 0;
 
 	char writeString[MAXDATASIZE];
@@ -497,7 +128,6 @@ int newStudent(char* student)
 		countSemikolon++;
    	}
 	
-	/*
 	FILE *mnrFile = NULL;
 	if((mnrFile = fopen("MNR", "r")) == NULL)
 		printf("Fehler1 beim MatrikelCounter");
@@ -517,7 +147,7 @@ int newStudent(char* student)
 	{
 		fprintf(mnrFile, "%i", mnrCounterInt); 
 		fclose(mnrFile);
-	}*/
+	}
 
 	if(chdir(input[4]) == -1) //in den Studiengangsordner wechseln, falls vorhanden
 	{ printf("Studiengang %s nicht vorhanden\n", input[4]); }
@@ -525,12 +155,13 @@ int newStudent(char* student)
 	{
 		printf("Erfolgreich nach %s gewechselt!\n", input[4]);
 		FILE *newFile = NULL;
-		newFile = fopen(input[3], "w");
+		newFile = fopen(mnrCounter, "w");
+		printf("MNR ist: %s", mnrCounter);
     		if(newFile)
     		{
 			printf("Student angelegt\n");
-			//fprintf(newFile, "%s;%s", mnrCounter,writeString);
-			fprintf(newFile, "%s",writeString);  
+			fprintf(newFile, "%s;%s", mnrCounter,writeString);
+			//fprintf(newFile, "%s",writeString);  
 			fclose(newFile);
 		}
 		

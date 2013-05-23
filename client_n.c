@@ -146,12 +146,19 @@ void createStudent(int socket){
     printf("Student anlegen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
+    char passwort[15];
     char vorname[23];
     char nachname[23];
-    char mNr[11];
     char bday[10];
     char studiengang[20];
     char auswahl[1];
+
+    printf("Passwort (max.10): >");
+    scanf("%s",&passwort);
+    if(strcmp(passwort,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
 
     printf("Vorname (max.20): >");
     scanf("%s",&vorname);
@@ -163,13 +170,6 @@ void createStudent(int socket){
     printf("Nachname (max.20): >");
     scanf("%s",&nachname);
     if(strcmp(nachname,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }
-
-    printf("Matrikelnummer (max.9): >");
-    scanf("%s",&mNr);
-    if(strcmp(mNr,"0")==0){
         sendMsg(socket,"0");
         return;
     }
@@ -195,7 +195,7 @@ void createStudent(int socket){
     strcpy(backup2,studiengang);
     printf("#############################\n");
     printf("Zusammenfassung:\n");
-    printf("%s %s, Mnr: %s, Studiengang: %s, Geb.: %s \n",vorname,nachname,mNr,studiengang,bday);
+    printf("Passwort: %s, %s %s, Studiengang: %s, Geb.: %s \n", passwort,vorname,nachname,studiengang,bday);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
     scanf("%s",&auswahl);
@@ -205,11 +205,11 @@ void createStudent(int socket){
 
     char message[MAXDATASIZE];
     message[0] = '\0';
+    strcat(message,passwort);
+    strcat(message,";");
     strcat(message,vorname);
     strcat(message,";");
     strcat(message,nachname);
-    strcat(message,";");
-    strcat(message,mNr);
     strcat(message,";");
     strcat(message,backup2);
     strcat(message,";");
