@@ -126,12 +126,14 @@ void addMark(int socket){
         sendMsg(socket,"0");
         return;
     }
+
     printf("Matrikelnummer (max.9): >");
     scanf("%s",&mNr);
     if(strcmp(mNr,"0")==0){
         sendMsg(socket,"0");
         return;
     }
+
     printf("Note (x.y): >");
     scanf("%s/0",&note);
     while(!validMarkInput(note)){
@@ -180,6 +182,13 @@ void createStudent(int socket){
     char bday[11];
     char studiengang[21];
     char auswahl[1];
+
+    printf("Passwort (max.10): >");
+    scanf("%s",&passwort);
+    if(strcmp(passwort,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
 
     printf("Vorname (max.20): >");
     scanf("%s",&vorname);
