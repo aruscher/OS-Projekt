@@ -174,11 +174,11 @@ void createStudent(int socket){
     printf("Student anlegen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char passwort[15];
-    char vorname[23];
-    char nachname[23];
-    char bday[10];
-    char studiengang[20];
+    char passwort[11];
+    char vorname[21];
+    char nachname[21];
+    char bday[11];
+    char studiengang[21];
     char auswahl[1];
 
     printf("Vorname (max.20): >");
