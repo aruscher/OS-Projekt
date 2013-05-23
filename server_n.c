@@ -197,9 +197,13 @@ int newStudent(char* student)
 int findStudent(int fd)
 {
 	printf("find Student\n");
+	char* directory;
+    directory = recMsg(fd);
 
-    	char* directory;
-    	directory = recMsg(fd);
+	if(strcmp(directory,"0")==0){
+		return;
+	}
+
 	char* student;
 
 	/*char** input;

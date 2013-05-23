@@ -212,9 +212,11 @@ void createStudent(int socket){
     strcat(message,backup2);
     strcat(message,";");
     strcat(message,backup1);
-
-    printf("Message: %s\n",message);
     sendMsg(socket,message);
+
+	char* msg;
+	msg = recMsg(socket);
+	printf("%s",msg);
 }
 
 void findGroup(int socket)
