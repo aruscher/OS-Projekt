@@ -25,15 +25,34 @@
 //0 if not exist, else 1
 int checkStudent(char* mNr){
     DIR *folder = opendir("./");
+	DIR *sfolder;
+	struct stat attribut;
 	struct dirent *mainfile;
+	struct dirent *subfile;
 	while((mainfile=readdir(folder))!=NULL){
-		printf("Look at file %s",mainfile->d_name);
+		stat(mainfile->d_name,&attribut);
+		if( attribut.st_mode & S_IFDIR){
+			char* name = mainfile->d_name;
+			if(strcmp(name,".")!=0 && strcmp(name,"..") && strcmp(name,".git")){
+				printf("DIR: %s\n",mainfile->d_name);
+				sfolder = opendir(mainfile->d_name);
+				while((subfile=readdir(sfolder))!=NULL){
+					char* subname = subfile->d_name;
+					if(strcmp(subname,mNr)==0){
+						return 1;
+					}
+					printf("%s/%s\n",mainfile->d_name,subfile->d_name);
+				}
+			}
+		}
 	}
 	if(folder==NULL){
 		perror("opendir");
 	}
+	printf("After traversal\n");
     return 0;
 }
+
 
 void sendMsg(int fd,char message[MAXDATASIZE]){
     send(fd,message,strlen(message),0);
