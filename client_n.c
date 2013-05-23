@@ -33,8 +33,8 @@ void showMainMenu(){
 	printf("1)Student anlegen\n");
 	printf("2)Student finden\n");
 	printf("3)Gruppe anlegen\n");
-	printf("4)Gruppe finden\n");
-    	printf("5)Note hinzufügen\n");
+	printf("4)Gruppenmitglieder anzeigen\n");
+    printf("5)Note hinzufügen\n");
 	printf("6)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");

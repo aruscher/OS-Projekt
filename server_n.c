@@ -385,9 +385,11 @@ int addMark(int fd)
 int findGroup(int fd) {
 
 	printf("find Group\n");
-    	char* directory;
-    	directory = recMsg(fd);
-
+    char* directory;
+    directory = recMsg(fd);
+	if(strcmp(directory,"0")){
+		return;
+	}
 	DIR *dir;
 	struct dirent *dirzeiger;
 
