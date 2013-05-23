@@ -37,8 +37,8 @@ int checkStudent(char* mNr){
         } 
     }
     return 0;
-}
-*/
+}*/
+
 void sendMsg(int fd,char message[MAXDATASIZE]){
     send(fd,message,strlen(message),0);
 }
@@ -428,28 +428,96 @@ void getBday(char* student)
 
 //FAB
 
-//PROBLEM: Wie wird verhindert, dass mehrere Studenten gleiche MNR haben? UserID muss eindeutig sein!
-void newStudent(char* student) 
+
+double average(char* student)
 {
-	/*int input[50];
-	input = seperateCSV(student);*/
+	char seps[]   = ";";
+	char* token;
+	int countSemikolon = 0;
+	char* input[MAXDATASIZE];
+
+	double notenSumme = 0.0;
+	double notenwert=0.0;
+	double notenDurchschnitt = 0.0;
+
+   	token = strtok(student, seps);	
+	while (token != NULL)
+	{
+		countSemikolon++;
+
+		//save current token
+		input[countSemikolon] = token;	
+		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+		if(countSemikolon >5)
+		{
+			notenwert = atof(token); //String into Double
+			notenSumme += notenwert;
+		}
+      		// Get next token:
+      		token = strtok( NULL, seps );
+   	}
+
+	if(countSemikolon > 5)
+	{
+		//printf("\nNotenAnzahl %i\n", (countSemikolon-5);
+		printf("\nNotenSumme %f\n", notenSumme);
+		notenDurchschnitt = notenSumme/(countSemikolon-5);
+		notenDurchschnitt = (int)(notenDurchschnitt*10)/10.0;
+		printf("\nNotenDurchschnitt %f\n", notenDurchschnitt);
+		
+		return notenDurchschnitt;
+	}
+	return -1;
+}
+
+//PROBLEM: Wie wird verhindert, dass mehrere Studenten gleiche MNR haben? UserID muss eindeutig sein!
+int newStudent(char* student) 
+{
+	char mnrCounter[9]= "\0";
+	//char newMnr[9]= "\0";
+	int mnrCounterInt = 0;
+
 	char writeString[MAXDATASIZE];
 	strcpy(writeString,student);
+	
 	char seps[]   = ";";
-	char *token;
+	char* token;
 	int countSemikolon = 1;
-	int input[50];
+	char* input[MAXDATASIZE];
 
    	token = strtok(student, seps);	
 	while (token != NULL)
 	{
 		//save current token
-		input[countSemikolon] = token;		
+		input[countSemikolon] = token;	
+		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
       		// Get next token:
       		token = strtok( NULL, seps );
 
 		countSemikolon++;
    	}
+	
+	/*
+	FILE *mnrFile = NULL;
+	if((mnrFile = fopen("MNR", "r")) == NULL)
+		printf("Fehler1 beim MatrikelCounter");
+	else
+	{
+		fgets(mnrCounter,15,mnrFile);
+		mnrCounterInt = atoi(mnrCounter);
+		mnrCounterInt++;
+		fclose(mnrFile); 
+	}
+
+	printf("Counter++: %i", mnrCounterInt); 
+
+	if((mnrFile = fopen("MNR", "w")) == NULL)
+		printf("Fehler2 beim MatrikelCounter");
+	else
+	{
+		fprintf(mnrFile, "%i", mnrCounterInt); 
+		fclose(mnrFile);
+	}*/
 
 	if(chdir(input[4]) == -1) //in den Studiengangsordner wechseln, falls vorhanden
 	{ printf("Studiengang %s nicht vorhanden\n", input[4]); }
@@ -461,7 +529,8 @@ void newStudent(char* student)
     		if(newFile)
     		{
 			printf("Student angelegt\n");
-			fprintf(newFile, "%s", writeString); 
+			//fprintf(newFile, "%s;%s", mnrCounter,writeString);
+			fprintf(newFile, "%s",writeString);  
 			fclose(newFile);
 		}
 		
@@ -477,40 +546,45 @@ void newStudent(char* student)
 			*h = '\0';
 			chdir(parentD);
 		}
+		return 1;
 	}
+	return -1;
 }
 
 int findStudent(int fd)
 {
 	printf("find Student\n");
+
     	char* directory;
     	directory = recMsg(fd);
-	/*int input[50];
-	input = seperateCSV(werte);*/
 	char* student;
 
+	/*char** input;
+	input=seperateCSV(directory);*/
+
 	char seps[]   = ";";
-	char *token;
+	char* token;
 	int countSemikolon = 1;
-	int input[50];
+	char* input[MAXDATASIZE];
 
    	token = strtok(directory, seps);	
 	while (token != NULL)
 	{
 		//save current token
-		input[countSemikolon] = token;		
+		input[countSemikolon] = token;	
+		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
       		// Get next token:
       		token = strtok( NULL, seps );
 
 		countSemikolon++;
    	}
+
 	
 	// In Gruppen-Verzeichnis wechseln
    	if(chdir(input[1]) == -1) 
 	{
 		printf("Gruppe nicht vorhanden\n");
-		//return EXIT_FAILURE;
-
+		sendMsg(fd, "\nGruppe nicht vorhanden.\n");
    	}
 	else
 	{
@@ -520,7 +594,7 @@ int findStudent(int fd)
 		if( (pFile = fopen(input[2], "r")) == NULL) //TODO: wenn nicht vorhanden, erstellt? NEIN!<-ar
 		{
       			printf("Student kann nicht gefunden werden\n");
-      			//return EXIT_FAILURE;
+      			sendMsg(fd, "\nDer Student konnte nicht gefunden werden.\n");
 		}
 		else
 		{
@@ -536,8 +610,23 @@ int findStudent(int fd)
       			fputs(*gptr,stdout);
 			*/
 			//TODO: send it to client
-			//BEGIN CD
 
+			char *datenStudent;
+			datenStudent=malloc(500);
+
+			while((fscanf(pFile,"%500s",datenStudent)) != EOF)
+			printf("%s\n",datenStudent);
+			fclose(pFile);
+			
+			double avg = average(datenStudent);
+			if(avg == -1)
+				printf("Keine Noten vorhanden\n");
+			//else
+
+			sendMsg(fd, "\nStudent wurde gefunden. Zukünftig hier Daten des Studenten.\n");
+			
+//BEGIN CD
+/*
 			double notenDurchschnitt = 0.0;
 
 			char *datenStudent;
@@ -552,18 +641,16 @@ int findStudent(int fd)
 			while((fscanf(pFile,"%500s",datenStudent)) != EOF)
 			printf("%s\n",datenStudent);
 			fclose(pFile);
-	
+			
 			notenDurchschnitt=calcAverage(datenStudent);
 			getVorname(datenStudent);
 			getNachname(datenStudent);
 			getMnr(datenStudent);
 			getStudiengang(datenStudent);
 			getBday(datenStudent);
-			getNoten(datenStudent);
+			getNoten(datenStudent);*/
 
 			//ENDE CD			
-
-			fclose(pFile);
 
 		}
 		char parentD[200];
@@ -585,33 +672,34 @@ int findStudent(int fd)
 int addMark(int fd)
 {
 	printf("add Mark\n");
+
     	char* directory;
     	directory = recMsg(fd);
-	/*int input[50];
-	input = seperateCSV(werte);*/
 	char* student;
 
 	char seps[]   = ";";
-	char *token;
+	char* token;
 	int countSemikolon = 1;
-	int input[50];
+	char* input[MAXDATASIZE];
 
    	token = strtok(directory, seps);	
 	while (token != NULL)
 	{
 		//save current token
-		input[countSemikolon] = token;		
+		input[countSemikolon] = token;	
+		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
       		// Get next token:
       		token = strtok( NULL, seps );
 
 		countSemikolon++;
    	}
+
 	
 	// In Gruppen-Verzeichnis wechseln
    	if(chdir(input[1]) == -1) 
 	{
 		printf("Gruppe nicht vorhanden\n");
-		//return EXIT_FAILURE;
+		sendMsg(fd, "\nGruppe nicht gefunden.\n");
    	}
 	else
 	{
@@ -622,13 +710,14 @@ int addMark(int fd)
 		if( (pFile = fopen(input[2], "a")) == NULL)
 		{
       			printf("Student kann nicht gefunden werden");
-      			//return EXIT_FAILURE;
+      			sendMsg(fd, "\nStudent wurde nicht gefunden.\n");
 		}
 		else
 		{
 			fprintf(pFile, ";%s", input[3]); 
 			fclose(pFile);
 			printf("Note hinzugefügt");
+			sendMsg(fd, "\nDie Note wurde hinzugefügt.\n");
 		}
 
 		char parentD[200];
@@ -657,7 +746,7 @@ int findGroup(int fd) {
 
   	 /* das Verzeichnis öffnen */
    	if((dir=opendir(directory)) == NULL) 
-	{ printf("Fehler bei opendir\n"); }
+	{ printf("Fehler bei opendir\n"); sendMsg(fd, "\nGruppe nicht gefunden.\n");}
 	else
 	{
 		off_t pos;
@@ -666,7 +755,7 @@ int findGroup(int fd) {
    		/* das komplette Verzeichnis auslesen */
 		
    		while((dirzeiger=readdir(dir)) != NULL)
-      		{	printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); printf("Zeiger:%llu\n",pos); }
+      		{	printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); printf("Zeiger:%ld\n",pos); }
 
 		//TODO: auch 2 falsche einträge ("." und "..")
 		// vllt daher: if entry name is a symbolic link, a value is unspecified
@@ -674,29 +763,11 @@ int findGroup(int fd) {
    		/* Lesezeiger wieder schließen */
    		if(closedir(dir) == -1)
       			printf("Fehler beim Schließen von %s\n", directory);
+		
+		sendMsg(fd, "\nGruppe gefunden. In Zukunft hier Ausgabe der enthaltenen Studenten.\n");
 	}
 }
 
-/*
-int seperateCSV(char* student)
-{
-	char seps[]   = ";";
-	char *token;
-	int countSemikolon = 1;
-	int input[50];
-
-   	token = strtok(student, seps);	
-	while (token != NULL)
-	{
-		//save current token
-		input[countSemikolon] = token;		
-      		// Get next token:
-      		token = strtok( NULL, seps );
-
-		countSemikolon++;
-   	}
-	return input;
-}*/
 //Ende FAB
 
 int createStudent(int fd){
@@ -705,10 +776,12 @@ int createStudent(int fd){
     student = recMsg(fd);
     printf("StudentRec: %s \n",student);
     if (strcmp(student,"0")==0){
-        printf("creaate Student Abortet\n");
+        printf("create Student Abortet\n");
     } else {
-        printf("NEED TO WRITE %s TO FILE \n",student);
-	newStudent(student);
+	if(newStudent(student) != -1)
+		sendMsg(fd, "\nStudent wurde erfolgreich erstellt.\n");
+	else
+		sendMsg(fd, "\nFehler bei der Erstellung, bitte erneut versuchen.\n");
     }
     return 1;
 }
