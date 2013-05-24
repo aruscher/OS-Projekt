@@ -81,6 +81,69 @@ void createGroup(int fd){
 	return;
 }
 
+int validateLogin(char* student)
+{
+	char seps[]   = ";";
+	char* token;
+	int countSemikolon = 0;
+	char* input[MAXDATASIZE];
+
+   	token = strtok(student, seps);	
+	while (token != NULL)
+	{
+		countSemikolon++;
+
+		//save current token
+		input[countSemikolon] = token;	
+		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+      		// Get next token:
+      		token = strtok( NULL, seps );
+   	}
+
+    	DIR *folder = opendir("./");
+	DIR *sfolder;
+	struct stat attribut;
+	struct dirent *mainfile;
+	struct dirent *subfile;
+	while((mainfile=readdir(folder))!=NULL){
+		stat(mainfile->d_name,&attribut);
+		if( attribut.st_mode & S_IFDIR){
+			char* name = mainfile->d_name;
+			if(strcmp(name,".")!=0 && strcmp(name,"..") && strcmp(name,".git")){
+				printf("DIR: %s\n",mainfile->d_name);
+				sfolder = opendir(mainfile->d_name);
+				while((subfile=readdir(sfolder))!=NULL){
+					char* subname = subfile->d_name;
+					if(strcmp(subname,input[1])==0)
+					{
+						FILE *pFile = NULL;     
+						if( (pFile = fopen(input[2], "r")) == NULL)
+						{
+      						printf("Student kann nicht gefunden werden\n");
+      						//sendMsg(fd, "\nDer Student konnte nicht gefunden werden.\n");
+						}
+						else
+						{
+							char *datenStudent;
+							datenStudent=malloc(500);
+
+							while((fscanf(pFile,"%500s",datenStudent)) != EOF)
+							printf("%s\n",datenStudent);
+							fclose(pFile);
+							//TODO: datenStudent mit token zerlegen & Passwort 								vergleichen, an client rückmeldung schicken
+						}
+					}
+					printf("%s/%s\n",mainfile->d_name,subfile->d_name);
+				}
+			}
+		}
+	}
+	if(folder==NULL){
+		perror("opendir");
+	}
+	printf("After traversal\n");
+}
+
 double average(char* student)
 {
 	char seps[]   = ";";
@@ -121,88 +184,6 @@ double average(char* student)
 	}
 	return -1;
 }
-/*
-int newStudent(char* student) 
-{
-	char mnrCounter[9]= "\0";
-	int mnrCounterInt = 0;
-
-	char writeString[MAXDATASIZE];
-	strcpy(writeString,student);
-	
-	char seps[]   = ";";
-	char* token;
-	int countSemikolon = 1;
-	char* input[MAXDATASIZE];
-
-   	token = strtok(student, seps);	
-	while (token != NULL)
-	{
-		//save current token
-		input[countSemikolon] = token;	
-		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
-      		// Get next token:
-      		token = strtok( NULL, seps );
-
-		countSemikolon++;
-   	}
-	
-	FILE *mnrFile = NULL;
-	if((mnrFile = fopen("MNR", "r")) == NULL)
-		printf("Fehler1 beim MatrikelCounter");
-	else
-	{
-		fgets(mnrCounter,15,mnrFile);
-		mnrCounterInt = atoi(mnrCounter);
-		mnrCounterInt++;
-		fclose(mnrFile); 
-	}
-
-	printf("Counter++: %i", mnrCounterInt); 
-
-	if((mnrFile = fopen("MNR", "w")) == NULL)
-		printf("Fehler2 beim MatrikelCounter");
-	else
-	{
-		fprintf(mnrFile, "%i", mnrCounterInt); 
-		fclose(mnrFile);
-	}
-
-	if(chdir(input[4]) == -1) //in den Studiengangsordner wechseln, falls vorhanden
-	{ printf("Studiengang %s nicht vorhanden\n", input[4]); }
-   	else //vorhanden -> neuen File erstellen
-	{
-		printf("Erfolgreich nach %s gewechselt!\n", input[4]);
-		FILE *newFile = NULL;
-		newFile = fopen(mnrCounter, "w");
-		if(newFile == NULL){
-			perror("fopen");
-		}
-		printf("MNR ist: %s/n", mnrCounter);
-    		if(newFile)
-    		{
-			printf("Student angelegt\n");
-			fprintf(newFile, "%s;%s", mnrCounter,writeString);
-
-			fclose(newFile);
-		}
-		
-		char parentD[200];
-		if(getcwd(parentD, sizeof(parentD)) == NULL)
-		{
-			printf("Fehler bei getcwd\n");
-		}
-		else
-		{
-			char *h;
-			h = strrchr(parentD, '/');
-			*h = '\0';
-			chdir(parentD);
-		}
-		return 1;
-	}
-	return -1;
-}*/
 
 int findStudent(int fd)
 {
