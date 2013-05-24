@@ -10,7 +10,7 @@
 \begin{document}
 \maketitle
 \tableofcontents
-\newpage
+
 \section{Problem}
 	Ziel des Projektes war es, zu lernen, wie Dateien mit Hilfe von Client/Server Stream Socket Programmierung (mit TCP/IP Sockets) angelegt und verwaltet werden können. Das wie folgt beschriebene Grundsystem wurde von uns mit einem Datei-Zugriffsschutz erweitert. 
 	Unsere Gruppe hat sich für Option b) entschieden: den Datei-Zugriffsschutz. Hierbei wird zwischen normalen Nutzern und Administratoren unterschieden, die sich durch verschiedene Rechte auszeichnen. Nach einem Login, der zum einen die Gültigkeit prüft, werden an dieser Stelle auch die Rechte ermittelt. Durch die Rechteverteilung werden dem Nutzer auf Clientseite verschiedene Funktionen zur Auswahl gestellt.\\
@@ -33,7 +33,6 @@
 	\subsection{Kommunikation zwischen Server und Client}
 		Für unser Projekt verwenden wir verbindungsorientierte Sockets. Es wird eine festbestehende Verbindung zwischen dem Client und Server aufgebaut. Mit diesem Hilfsmittel wird ein Datenaustausch ermöglicht, der erlaubt, dass Daten zwischeneinander versendet werden können.\\
 		Der theorethische Ablauf, wie die Kommunikation erfolgt ist wie folgt:
-		\newpage
 		\textbf{Client-seitig:}
 		\begin{enumerate}
 			\item Socket erstellen
@@ -128,13 +127,39 @@
 		\includegraphics[scale=0.6]{menue.jpg}
 		\end{center}
 	\subsection{Client}
-		\subsubsection{Funktionen}
-		\subsubsection{Ausgaben}
-		\subsubsection{Menüführung}
-	\subsection{Server}
-		\subsubsection{Arbeitsweise}
-		\subsubsection{Funktionen}
-		\subsubsection{Ausgaben}
-\section{Nutzerhandbuch}
 
+	\subsection{Server}
+
+\section{Nutzerhandbuch}
+	\subsection{Inbetriebnahme}
+		Als Betriebssystem wird eine Linux Distribution vorrausgesetzt. Um das C Programm zu kompilieren, führt der Nutzer im Terminal $\glqq$make install$\grqq$ aus. Wichtig ist, dass er sich im richtigen Verzeichnis befindet - in dem sich auch das Skrip $\glqq$makefile$\grqq$ befindet. In zwei verschiedenen Terminals werden nun die ausführbaren Datein gestartet.\\
+		In Terminal 1 wird durch $\glqq$./servern$\grqq$ der Server gestartet.\\
+		Den Client startet der Nutzer in dem Terminal 2, durch die Eingabe von $\glqq$./clientn 127.0.0.1$\grqq$.
+	\subsection{Server}
+		Auf Seiten der Servers werden keine Eigaben oder Interaktionen zur Verfügung gestellt. Es werden gegebenenfalls Rückmeldungen ausgegeben, wenn der Client mit dem Server interagiert. Die Dateipflege kann neben dem Client-Interface auch manuell gehandhabt werden: Ordner als Studiengang hinzufügen, neue Dateien als Studenten anlegen oder Dateien öffnen und bearbeiten. Bei Einhaltung der oben genannten Spezifikationen kommt es dadurch zu keinen Fehlern.
+	\subsection{Client}
+		Bei Nutzung des Clients im Terminal 2 führt das Programm den Nutzer durch eine intutive Menüführung. Zurück zu dem Hauptmenü kann der Nutzer jeder Zeit durch die Eingabe einer 0 gelangen.
+		\subsubsection{Login}
+			Nach Starten des Servers werden der Nutzername und das zugehörige Passwort abgefragt. Authentifizieren tuen sich die Studenten durch ihre Matrikelnummer und das zugehörige Passwort. 
+			Die Administratoren besitzten den Nutzernamen $\glqq$Admin$\grqq$ und das Passwort $\glqq$abcd$\grqq$.
+		\subsubsection{Studenten anlegen}
+			Einen neuen Studen anlegen ist nur für Administratoren möglich. Dieser wird aufgefordert stückchenweise dei Stammdaten des Studenten einzugeben: Vorname, Nachname, Matrikelnummer, Studiengang und Geburtstag.\\
+			Hierbei wird der Ersteller auf die maximale Länge der Eingabe hingewiesen. Nachdem alle Daten eingeben wurden müssen die Daten noch mit einer $\glqq$1$\grqq$ bestätigt werden. Hiernach wird durch diese Eingabe  eine Datei mit der Matrikelnummer als Name und im passenden Ordner (dem Studiengang) angelegt.
+		\subsubsection{Gruppe anlegen}
+			Hier wird dem Administrator die Möglichkeit gegeben, bei Bedarf, einen neuen Studiengang hinzuzufügen. Auch hier wird ein Name mit der maximalen Länge von 20 Zeichen angefordert, sodass, nach der Bestätigung, ein neues Verzeichnis mit diesem Namen erstellt wird.
+		\subsubsection{(Studenten)daten anzeigen}
+			Je nachdem wer diese Funktion aufruft ereignen sich unterschiedliche Interaktionen. \\
+			Wenn jemand mit Administrator-Rechten sich Studentendaten anzeigen lassen möchte, wird er gefragt welchem Studiengang der Student angehört und welche Matrikelnummer dieser besitzt.\\
+			Handelt es sich um einen Studenten, ist keine Angabe seiner Matrikelnummer nötig. Es werden gleich seine Daten ausgegeben.\\
+			In beiden Fällen werden alle Daten und der zugehörige, bei Anfrage berechnete, Durchschnitt ausgegeben.
+		\subsubsection{Gruppe anzeigen}
+			Diese Funktion ist für Administratoren dahin gehend interessant, da sie für eine Gruppe alle Studenten ausgiebt, die sich in ihr befinden. Dazu ist es nötig den Namen des Studiengangs anzugeben.
+		\subsubsection{Note hinzufügen}
+			Für ein Software-Projekt, wie dieses, ist es sinnvoll, dass Studenten weitere Noten hinzugefügt werden können. Damit nicht jeder Student sich selbst Noten geben kann, ist dies nur vom Administrator aus möglich. Hierfür müssen wieder Studiengang und Matrikelnummer des Studenten angegeben werden. Dazu kommt naheliegender Weise auch die Note die dem Studenten zugedacht ist. Nach einer Bestätigung wird nun in der Studentendatei hinten die Note angefügt.
+		\subsubsection{Gruppenbesten ermitteln}
+			Diese Funktionalität ist ebenfalls den Administratoren vorbehalten. Es wird aus jedem Studiengang der Beste ermittelt. Dafür werden von allen Studenten die Durchschnitte gebildet und miteinander verglichen. Studenten wird nicht die Möglichkeit gegeben ihren Durchschnitt mit anderen zu vergleich. Diese Funktion bleibt Administratoren vorbehalten.
+		\subsubsection{Gesamtbesten ermitteln}
+			Ähnlich wie bei dem Gruppenbesten werden auch hier Studenten verglichen. Um den Gesamtbesten zu ermitteln werden die Gruppenbesten anhand ihrer Durchschnitte verglichen. Nur Administratoren können den Besten ermitteln.
+		\subsubsection{Beenden}
+			Beendet die Kommunikation zwischen Client und Server. 
 \end{document}
