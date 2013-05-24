@@ -31,7 +31,28 @@
 		
 		\end{enumerate}
 	\subsection{Kommunikation zwischen Server und Client}
+		Für unser Projekt verwenden wir verbindungsorientierte Sockets. Es wird eine festbestehende Verbindung zwischen dem Client und Server aufgebaut. Mit diesem Hilfsmittel wird ein Datenaustausch ermöglicht, der erlaubt, dass Daten zwischeneinander versendet werden können.\\
+		Der theorethische Ablauf, wie die Kommunikation erfolgt ist wie folgt:
+		\newpage
+		\textbf{Client-seitig:}
+		\begin{enumerate}
+			\item Socket erstellen
+			\item erstellten Socket mit der Server-Adresse verbinden, von welcher Daten angefordert werden sollen
+			\item senden und empfangen von Daten
+			\item evtl. Socket herunterfahren (shutdown())
+			\item Verbindung trennen, Socket schließen
+		\end{enumerate}
 		
+		\textbf{Server-seitig:}
+		\begin{enumerate}
+			\item Server-Socket erstellen
+			\item binden des Sockets an eine Adresse (Port), über welche Anfragen akzeptiert werden
+			\item auf Anfragen warten
+			\item Anfrage akzeptieren und damit ein neues Socket-Paar für diesen Client erstellen
+			\item bearbeiten der Client-Anfrage auf dem neuen Client-Socket
+			\item Client-Socket wieder schließen
+		\end{enumerate}
+
 	\subsection{Dateizugriff}
 		In unserm Projekt nutzen wir das CDV-Dateiformat um die Datensätze von Studenten auf eine praktische Art und Weise speichern und auslesen zu können. Um die Studenten ihrer zugehörigen Gruppen zuzuordnen, werden diese in Verzeichnissen abgelegt.\\
 		Diese Verzeichnisse werden anhand ihrer Bennenungen unterschieden, z.B.: steht der Ordner ITTI für die Studenten, die der Informationstechnik / Technische Informatik angehören.\\
@@ -62,23 +83,23 @@
 			
 			\textbf{Studenten der Informatik:}
 			\begin{itemize}
-				\item 123;Tom;Klein;?????????;Informatik;01.01.19901.0;4.0;1.7;3.0
-				\item 234;Max;Mustermann;?????????;Informatik;23.05.2001;1.0;1.3;2.7
-				\item 345;Benjamin;Groß;?????????;Informatik;14.12.1986;1.0;1.3;2.7;3.3;1.7;5.0
+				\item 123;Tom;Klein;100000010;Informatik;01.01.19901.0;4.0;1.7;3.0
+				\item 234;Max;Mustermann;100000011;Informatik;23.05.2001;1.0;1.3;2.7
+				\item 345;Benjamin;Groß;100000012;Informatik;14.12.1986;1.0;1.3;2.7;3.3;1.7;5.0
 			\end{itemize}
 			
 			\textbf{Studenten der ITTI:}
 			\begin{itemize}
-				\item 456;Even;Longer;?????????;ITTI;15.11.1977;1.3;2.7;3.3;1.7;5.0;1.0
-				\item 567;Very;Long;?????????;ITTI;12.05.1993;1.0;1.3;2.7;1.0;5.0;1.0;1.0;1.0
-				\item 678;Alfons;Hatler;?????????;ITTI;14.03.1989;1.0;1.0;1.0;1.0
+				\item 456;Even;Longer;100000013;ITTI;15.11.1977;1.3;2.7;3.3;1.7;5.0;1.0
+				\item 567;Very;Long;100000014;ITTI;12.05.1993;1.0;1.3;2.7;1.0;5.0;1.0;1.0;1.0
+				\item 678;Alfons;Hatler;100000015;ITTI;14.03.1989;1.0;1.0;1.0;1.0
 			\end{itemize}
 			
 			\textbf{Studenten der Elektrotechnik:}
 			\begin{itemize}
-				\item 789;John;McClane;?????????;Elektrotechnik;24.12.1966;1.3;3.7;5.0;4.0
-				\item 890;Hans;Gruber;?????????;Elektrotechnik;15.07.1991;1.3;5.0;2.7;1.0;4.0;1.7;3.0;2.0
-				\item 901;Holly;McClane;?????????;Elektrotechnik;30.08.1988;1.7;1.3;1.3;1.7;1.0;1.7;1.7
+				\item 789;John;McClane;100000016;Elektrotechnik;24.12.1966;1.3;3.7;5.0;4.0
+				\item 890;Hans;Gruber;100000017;Elektrotechnik;15.07.1991;1.3;5.0;2.7;1.0;4.0;1.7;3.0;2.0
+				\item 901;Holly;McClane;100000018;Elektrotechnik;30.08.1988;1.7;1.3;1.3;1.7;1.0;1.7;1.7
 			\end{itemize}
 		
 	\subsection{Umzusetztende Funktionalitäten}
@@ -101,20 +122,19 @@
 				\item[Beenden] Beendet die Kommunikation mit dem Server und schließt das Programm auf Seite des Clients.
 			\end{description}
 \section{Praktische Umsetzung}
-\subsection{Client}
-\subsubsection{Menü}
-	Die in Kapitel 2.4 Beschriebenen Funktionalitäten führen zu zwei unterschiedlichen Menü-Formen. Abhängig von den Rechten, die dem Nutzer nach dem Login zugeteilt werden, wird ein entsprechendes Menü angezeigt.
-	
-	\begin{center}
-	\includegraphics[scale=0.6]{menue.jpg}
-	\end{center}
-\subsubsection{Funktionen}
-\subsubsection{Ausgaben}
-\subsubsection{Menüführung}
-\subsection{Server}
-\subsubsection{Arbeitsweise}
-\subsubsection{Funktionen}
-\subsubsection{Ausgaben}
+	\subsection{Menü}
+		Die in Kapitel 2.4 Beschriebenen Funktionalitäten führen zu zwei unterschiedlichen Menü-Formen. Abhängig von den Rechten, die dem Nutzer nach dem Login zugeteilt werden, wird ein entsprechendes Menü angezeigt.
+		\begin{center}
+		\includegraphics[scale=0.6]{menue.jpg}
+		\end{center}
+	\subsection{Client}
+		\subsubsection{Funktionen}
+		\subsubsection{Ausgaben}
+		\subsubsection{Menüführung}
+	\subsection{Server}
+		\subsubsection{Arbeitsweise}
+		\subsubsection{Funktionen}
+		\subsubsection{Ausgaben}
 \section{Nutzerhandbuch}
 
 \end{document}
