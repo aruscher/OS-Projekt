@@ -58,15 +58,14 @@ void showMainMenu(){
 	printf("Menu\n----\n");
 	printf("1)Student anlegen\n");
 	printf("2)Student finden\n");
-	printf("3)Gruppe anlegen\n");
-	printf("4)Gruppenmitglieder anzeigen\n");
-    printf("5)Note hinzufügen\n");
+	printf("3)Studiengang anlegen\n");
+	printf("4)Studiengangsmitglieder anzeigen\n");
+    	printf("5)Note hinzufügen\n");
 	printf("6)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");
 }
 
-//FAB
 void findStudent(int socket){
     printf("Student finden\n");
     printf("---------------\n");
@@ -109,6 +108,7 @@ void findStudent(int socket){
 
     printf("Message: %s\n",message);
     sendMsg(socket,message);
+    recMsg(socket);
 }
 
 void addMark(int socket){
@@ -169,8 +169,8 @@ void addMark(int socket){
 
     printf("Message: %s\n",message);
     sendMsg(socket,message);
+    recMsg(socket);
 }
-//Ende FAB
 
 void createStudent(int socket){
     printf("Student anlegen\n");
@@ -182,13 +182,6 @@ void createStudent(int socket){
     char bday[11];
     char studiengang[21];
     char auswahl[1];
-
-    printf("Passwort (max.10): >");
-    scanf("%s",&passwort);
-    if(strcmp(passwort,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }
 
     printf("Vorname (max.20): >");
     scanf("%s",&vorname);
@@ -227,7 +220,7 @@ void createStudent(int socket){
     }
 
 
-    printf("Studiengang (max.20): >");
+    printf("Studiengang (muss vorhanden sein, max.20): >");
     scanf("%s",&studiengang);
     while(!validStudentInput(studiengang)){
         printf("Ungültige Eingabe mit ;\n");
@@ -257,7 +250,7 @@ void createStudent(int socket){
     strcpy(backup2,studiengang);
     printf("#############################\n");
     printf("Zusammenfassung:\n");
-    printf("Passwort: %s, %s %s, Studiengang: %s, Geb.: %s \n", passwort,vorname,nachname,studiengang,bday);
+    printf("%s %s, Studiengang: %s, Geb.: %s \n, Passwort: %s",vorname,nachname,studiengang,bday,passwort);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
     scanf("%s",&auswahl);
@@ -268,18 +261,16 @@ void createStudent(int socket){
     char message[MAXDATASIZE];
     sprintf(message,"%s;%s;%s;%s;%s",passwort,vorname,nachname,backup2,backup1);
     sendMsg(socket,message);	
-    char* msg;
-	msg = recMsg(socket);
-	printf("%s",msg);
+    recMsg(socket);
 }
 
 void findGroup(int socket)
 {
-    printf("Gruppe suchen\n");
+    printf("Studiengangsmitglieder finden\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
     char title[MAXDATASIZE];
-    printf("Bitte geben Sie den gesuchten Gruppennamen an: >");
+    printf("Bitte geben Sie den gesuchten Studiengang an: >");
     scanf("%s",&title);
     if(strcmp(title,"0")==0)
     {
@@ -287,10 +278,11 @@ void findGroup(int socket)
         return;
     }
     sendMsg(socket,title);
+    recMsg(socket);
 }
 
 void createGroup(int socket){
-    printf("Gruppe anlegen\n");
+    printf("Studiengang anlegen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
     char title[MAXDATASIZE];
@@ -301,9 +293,7 @@ void createGroup(int socket){
         return;
     }
     sendMsg(socket,title);
-	char* message = recMsg(socket);
-	printf(message);
-	return;
+    recMsg(socket);
 }
 
 void exitProgramm(){

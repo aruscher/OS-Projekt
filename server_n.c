@@ -67,28 +67,28 @@ char* recMsg(int fd){
     return rec;
 }
 
-void createGroup(int fd){
-    char* title = recMsg(fd);
-	if(strcmp(title,"0")==0){
-		return;
-	}
+void createGroup(int fd)
+{
+    	char* title = recMsg(fd);
+	if(strcmp(title,"0")==0)
+	{	 sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
 	if(mkdir(title,S_IRWXU|S_IRGRP|S_IXGRP)!=0){
 		perror("mkdir\n");
-		sendMsg(fd,"Gruppe konnte nicht erstellt werden");
+		sendMsg(fd,"Studiengang konnte nicht erstellt werden"); return;
 	}
 	printf("Group created\n");
-	sendMsg(fd,"Gruppe erfolreich erstellt");
+	sendMsg(fd,"Studiengang erfolreich erstellt");
 	return;
 }
 
-int validateLogin(char* student)
+int validateLogin(char* login)
 {
 	char seps[]   = ";";
 	char* token;
 	int countSemikolon = 0;
 	char* input[MAXDATASIZE];
 
-   	token = strtok(student, seps);	
+   	token = strtok(login, seps);	
 	while (token != NULL)
 	{
 		countSemikolon++;
@@ -109,18 +109,22 @@ int validateLogin(char* student)
 		stat(mainfile->d_name,&attribut);
 		if( attribut.st_mode & S_IFDIR){
 			char* name = mainfile->d_name;
-			if(strcmp(name,".")!=0 && strcmp(name,"..") && strcmp(name,".git")){
+			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
 				printf("DIR: %s\n",mainfile->d_name);
 				sfolder = opendir(mainfile->d_name);
 				while((subfile=readdir(sfolder))!=NULL){
 					char* subname = subfile->d_name;
 					if(strcmp(subname,input[1])==0)
 					{
-						FILE *pFile = NULL;     
-						if( (pFile = fopen(input[2], "r")) == NULL)
+						FILE *pFile = NULL;
+   						if((chdir(mainfile->d_name) == -1) || 
+							((pFile = fopen(input[1], "r")) == NULL))      
 						{
-      						printf("Student kann nicht gefunden werden\n");
-      						//sendMsg(fd, "\nDer Student konnte nicht gefunden werden.\n");
+      							printf("Problem beim Öffnen des Ordners/Datei.\n");
+							perror("chdir");
+							perror("fopen");
+							return -1;
+      							//sendMsg(fd, "\nExestiert nicht.\n");
 						}
 						else
 						{
@@ -130,7 +134,38 @@ int validateLogin(char* student)
 							while((fscanf(pFile,"%500s",datenStudent)) != EOF)
 							printf("%s\n",datenStudent);
 							fclose(pFile);
-							//TODO: datenStudent mit token zerlegen & Passwort 								vergleichen, an client rückmeldung schicken
+
+							countSemikolon = 0;
+							char* student[MAXDATASIZE];
+
+   							token = strtok(datenStudent, seps);	
+							while (token != NULL)
+							{
+								countSemikolon++;
+
+								//save current token
+								student[countSemikolon] = token;	
+      								// Get next token:
+      								token = strtok( NULL, seps );
+   							}
+							if(strcmp(input[2],student[2])==0)
+							{printf("PASSWORD SUCCESS!"); return 0;}
+							else
+							{printf("PASSWORD WRONG!");}
+
+							char parentD[200];
+							if(getcwd(parentD, sizeof(parentD)) == NULL)
+							{
+								perror("getcwd");
+								printf("Fehler bei getcwd\n");
+							}
+							else
+							{
+								char *h;
+								h = strrchr(parentD, '/');
+								*h = '\0';
+								chdir(parentD);
+							}
 						}
 					}
 					printf("%s/%s\n",mainfile->d_name,subfile->d_name);
@@ -138,10 +173,14 @@ int validateLogin(char* student)
 			}
 		}
 	}
-	if(folder==NULL){
-		perror("opendir");
-	}
+	if(folder==NULL)
+	{	perror("opendir"); }
 	printf("After traversal\n");
+	
+	printf("Benutzer existiert nicht.\n");
+	return -1;
+
+	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
 }
 
 double average(char* student)
@@ -191,9 +230,8 @@ int findStudent(int fd)
 	char* directory;
 	directory = recMsg(fd);
 
-	if(strcmp(directory,"0")==0){
-		return;//TODO: Fehlerstring an Client?
-	}
+	if(strcmp(directory,"0")==0)
+	{ 	sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
 
 	char seps[]   = ";";
 	char* token;
@@ -215,8 +253,8 @@ int findStudent(int fd)
 	// In Gruppen-Verzeichnis wechseln
    	if(chdir(input[1]) == -1) 
 	{
-		printf("Gruppe nicht vorhanden\n");
-		sendMsg(fd, "\nGruppe nicht vorhanden.\n");
+		printf("Studiengang nicht vorhanden\n");
+		sendMsg(fd, "\nStudiengang nicht vorhanden.\n");
    	}
 	else
 	{
@@ -253,13 +291,8 @@ int findStudent(int fd)
    			}
 
 			char message[MAXDATASIZE];
-			message[0] = '\0';
-			strcat(message,"\nMNR: ");strcat(message,student[1]);
-			strcat(message,"\nPasswort: ");strcat(message,student[2]);
-			strcat(message,"\nVorname: ");strcat(message,student[3]);
-			strcat(message,"\nName: ");strcat(message,student[4]);
-			strcat(message,"\nGruppe: ");strcat(message,student[5]);
-			strcat(message,"\nGeb: ");strcat(message,student[6]);
+			sprintf(message,"MNR: %s\nPasswort: %s\nVorname: %s\nName: %s\nStudiengang: %s	\nGeburtstag: %s\n",student[1],student[2],student[3],student[4],student[5],student[6]);
+     			sendMsg(fd, message);
 
 			if(countSemikolon < 7)
 				sendMsg(fd, message);
@@ -274,7 +307,7 @@ int findStudent(int fd)
 				sendMsg(fd, message);
 			} 
 			
-			/*double avg = average(datenStudent); //TODO char** übergeben? Durchschnitt ausgeben?
+			double avg = average(datenStudent); //TODO char** übergeben? Durchschnitt ausgeben?
 			if(avg == -1)
 			{
 				printf("Keine Noten vorhanden\n");
@@ -283,7 +316,7 @@ int findStudent(int fd)
 			else
 			{
 				sendMsg(fd, "\nStudent wurde gefunden. Zukünftig hier Daten des Studenten.\n");
-			}*/			
+			}			
 
 		}
 		char parentD[200];
@@ -332,8 +365,8 @@ int addMark(int fd)
 		// In Gruppen-Verzeichnis wechseln
    		if(chdir(input[1]) == -1) 
 		{
-			printf("Gruppe nicht vorhanden\n");
-			sendMsg(fd, "\nGruppe nicht gefunden.\n");
+			printf("Studiengang nicht vorhanden\n");
+			sendMsg(fd, "\nStudiengang nicht gefunden.\n");
    		}
 		else
 		{
@@ -369,41 +402,43 @@ int addMark(int fd)
 	}
 	else
 	{	sendMsg(fd, "\nStudent existiert nicht.\n");}
+	return;
 }
 
 int findGroup(int fd) {
 
 	printf("find Group\n");
-    char* directory;
-    directory = recMsg(fd);
-	if(strcmp(directory,"0")){
-		return;
-	}
+    	char* directory;
+    	directory = recMsg(fd);
+	if(strcmp(directory,"0") == 0)
+	{	sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
+
 	DIR *dir;
 	struct dirent *dirzeiger;
-
-  	 /* das Verzeichnis öffnen */
-   	if((dir=opendir(directory)) == NULL) 
-	{ printf("Fehler bei opendir\n"); sendMsg(fd, "\nGruppe nicht gefunden.\n");}
+ 	/* das Verzeichnis öffnen */
+	if((dir=opendir(directory)) == NULL) 
+	{ printf("Fehler bei opendir\n"); sendMsg(fd, "\nStudiengang nicht gefunden.\n");}
 	else
 	{
 		off_t pos;
-
 		printf("Im Studiengang %s sind folgende Studenten:\n", directory);
-   		/* das komplette Verzeichnis auslesen */
+		/* das komplette Verzeichnis auslesen */
 		
-   		while((dirzeiger=readdir(dir)) != NULL)
-      		{	printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); printf("Zeiger:%ld\n",pos); }
+		while((dirzeiger=readdir(dir)) != NULL)
+		{	
+			printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); printf("Zeiger:%ld\n",pos); 
+		}
 
 		//TODO: auch 2 falsche einträge ("." und "..")
 		// vllt daher: if entry name is a symbolic link, a value is unspecified
-
-   		/* Lesezeiger wieder schließen */
-   		if(closedir(dir) == -1)
-      			printf("Fehler beim Schließen von %s\n", directory);
 		
-		sendMsg(fd, "\nGruppe gefunden. In Zukunft hier Ausgabe der enthaltenen Studenten.\n");
+		/* Lesezeiger wieder schließen */
+		if(closedir(dir) == -1)
+		{	printf("Fehler beim Schließen von %s\n", directory); }
+		
+		sendMsg(fd, "\nStudiengang gefunden. In Zukunft hier Ausgabe der enthaltenen Studenten.\n");
 	}
+	return;
 }
 
 int createStudent(int fd)
@@ -413,90 +448,91 @@ int createStudent(int fd)
 	student = recMsg(fd);
 	printf("StudentRec: %s \n",student);
 	if (strcmp(student,"0")==0)
-	{	printf("create Student Abortet\n"); } 
-	else 
-	{	
-		char mnrCounter[9]= "\0";
-		int mnrCounterInt = 0;
-
-		char writeString[MAXDATASIZE];
-		strcpy(writeString,student);
+	{	sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; } 
 	
-		char seps[]   = ";";
-		char* token;
-		int countSemikolon = 1;
-		char* input[MAXDATASIZE];
+	char mnrCounter[9]= "\0";
+	int mnrCounterInt = 0;
 
-   		token = strtok(student, seps);	
-		while (token != NULL)
-		{
-			//save current token
-			input[countSemikolon] = token;	
-			printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
-      			// Get next token:
-      			token = strtok( NULL, seps );
+	char writeString[MAXDATASIZE];
+	strcpy(writeString,student);
 	
-			countSemikolon++;
-	   	}
+	char seps[]   = ";";
+	char* token;
+	int countSemikolon = 1;
+	char* input[MAXDATASIZE];
+
+	token = strtok(student, seps);	
+	while (token != NULL)
+	{
+		//save current token
+		input[countSemikolon] = token;	
+		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+		// Get next token:
+		token = strtok( NULL, seps );
+	
+		countSemikolon++;
+   	}
 		
-		FILE *mnrFile = NULL;
-		if((mnrFile = fopen("MNR", "r")) == NULL)
-			printf("Fehler1 beim MatrikelCounter");
+	FILE *mnrFile = NULL;
+	if((mnrFile = fopen("MNR", "r")) == NULL)
+		printf("Fehler1 beim MatrikelCounter");
+	else
+	{
+		fgets(mnrCounter,15,mnrFile);
+		mnrCounterInt = atoi(mnrCounter);
+		mnrCounterInt++;
+		fclose(mnrFile); 
+	}
+
+	printf("Counter++: %i\n", mnrCounterInt); 
+	
+	if((mnrFile = fopen("MNR", "w")) == NULL)
+	{	sendMsg(fd, "\nFehler in der MNR-Datei.\n"); return;}
+	else
+	{
+		fprintf(mnrFile, "%i", mnrCounterInt); 
+		fclose(mnrFile);
+	}
+	
+	if(chdir(input[4]) == -1) //in den Studiengangsordner wechseln, falls vorhanden
+	{ 
+		printf("Studiengang %s nicht vorhanden\n", input[4]); 
+		sendMsg(fd, "\nDer Studiengang ist nicht vorhanden.\n");
+	}
+	else //vorhanden -> neuen File erstellen
+	{
+		printf("Erfolgreich nach %s gewechselt!\n", input[4]);
+		FILE *newFile = NULL;
+		if((newFile = fopen(mnrCounter, "w")) == NULL)
+		{
+			perror("fopen");
+			sendMsg(fd, "\nFehler bei der Erstellung, bitte erneut versuchen.\n");
+		}
 		else
 		{
-			fgets(mnrCounter,15,mnrFile);
-			mnrCounterInt = atoi(mnrCounter);
-			mnrCounterInt++;
-			fclose(mnrFile); 
+			printf("Student angelegt\n");
+			fprintf(newFile, "%s;%s", mnrCounter,writeString);
+
+			fclose(newFile);
+
+			printf("%s\n", mnrCounter);
+			char message[MAXDATASIZE];
+			sprintf(message, "\nStudent wurde erfolgreich erstellt\nMNR: %s\n",mnrCounter);
+			
+			sendMsg(fd, message);
 		}
-	
-		printf("Counter++: %i\n", mnrCounterInt); 
-	
-		if((mnrFile = fopen("MNR", "w")) == NULL)
-			printf("Fehler2 beim MatrikelCounter");
+			
+		char parentD[200];
+		if(getcwd(parentD, sizeof(parentD)) == NULL)
+		{
+			printf("Fehler bei getcwd\n");
+		}
 		else
 		{
-			fprintf(mnrFile, "%i", mnrCounterInt); 
-			fclose(mnrFile);
-		}
-	
-		if(chdir(input[4]) == -1) //in den Studiengangsordner wechseln, falls vorhanden
-		{ printf("Studiengang %s nicht vorhanden\n", input[4]); 
-		sendMsg(fd, "\nDie Gruppe ist nicht vorhanden.\n");}
-	   	else //vorhanden -> neuen File erstellen
-		{
-			printf("Erfolgreich nach %s gewechselt!\n", input[4]);
-			FILE *newFile = NULL;
-			if((newFile = fopen(mnrCounter, "w")) == NULL){
-				perror("fopen");
-				sendMsg(fd, "\nFehler bei der Erstellung, bitte erneut versuchen.\n");
-			}
-			else
-	    		{
-				printf("Student angelegt\n");
-				fprintf(newFile, "%s;%s", mnrCounter,writeString);
-
-				fclose(newFile);
-
-				printf("%s\n", mnrCounter);
-				char message[MAXDATASIZE];
-				sprintf(message, "\nStudent wurde erfolgreich erstellt\nMNR: %s\n", 						mnrCounter);
-			
-				sendMsg(fd, message);
-			}
-			
-			char parentD[200];
-			if(getcwd(parentD, sizeof(parentD)) == NULL)
-			{
-				printf("Fehler bei getcwd\n");
-			}
-			else
-			{
-				char *h;
-				h = strrchr(parentD, '/');
-				*h = '\0';
-				chdir(parentD);
-			}
+			char *h;
+			h = strrchr(parentD, '/');
+			*h = '\0';
+			chdir(parentD);
 		}
 	}
 	return 1;
