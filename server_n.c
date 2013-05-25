@@ -33,7 +33,7 @@ int checkStudent(char* mNr){
 		stat(mainfile->d_name,&attribut);
 		if( attribut.st_mode & S_IFDIR){
 			char* name = mainfile->d_name;
-			if(strcmp(name,".")!=0 && strcmp(name,"..") && strcmp(name,".git")){
+			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
 				printf("DIR: %s\n",mainfile->d_name);
 				sfolder = opendir(mainfile->d_name);
 				while((subfile=readdir(sfolder))!=NULL){
@@ -229,14 +229,14 @@ int validateLogin(int fd)
 	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
 }
 
-int groupsBest(char* directory)//int fd)
+int groupsBest(char* int fd)
 {
 	printf("groupsBest\n");
-/*	char* directory;
+	char* directory;
     	directory = recMsg(fd);
 	if(strcmp(directory,"0") == 0)
-	{	sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
-*/
+	{	/*sendMsg(fd, "\nFehler bei der Datenübertragung.\n");*/ return; }
+
 	DIR *dir;
 	struct dirent *dirzeiger;
  	/* das Verzeichnis öffnen */
@@ -259,22 +259,59 @@ int groupsBest(char* directory)//int fd)
 
 	while((dirzeiger=readdir(dir)) != NULL)
 	{	
-		char* name = dirzeiger->d_name;
-		if(strcmp(name,".")!=0 && strcmp(name,"..") && strcmp(name,".git"))
+		char* name = (*dirzeiger).d_name;
+		if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
 		{
 			printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
 			printf("Zeiger:%ld\n",pos); 
-			if((avg = average(name)) != -1 && bestAvg == 0.0)
-			{ 	bestAvg = avg; bestsName = name;}
-			else if(avg != -1)
+
+			FILE *pFile = NULL; 
+			if((chdir(directory) == -1) || 
+				((pFile = fopen(name, "r")) == NULL))     
 			{
-				//TODO: bei Gleichheit des Durchschnitts?
-				compAvg = avg;
-				if(bestAvg > compAvg)
-				{	bestAvg = compAvg; bestsName = name; }
-			}
+      				printf("Problem beim Öffnen des Ordners/Datei.\n");
+				perror("chdir");
+				perror("fopen");
+				return -1;
+      				//sendMsg(fd, "\nExestiert nicht.\n");
+			}    
 			else
-			{ printf("Average ergab -1.\n\n"); }
+			{
+				char *datenStudent;
+				datenStudent=malloc(500);
+
+				while((fscanf(pFile,"%500s",datenStudent)) != EOF)
+				printf("%s\n",datenStudent);
+				fclose(pFile);
+
+				avg = average(datenStudent);
+				printf("AVERAGE: %g\n", avg);
+				if(avg != -1 && bestAvg == 0.0)
+				{ 	bestAvg = avg; bestsName = name; }
+				else if(avg != -1)
+				{
+					//TODO: bei Gleichheit des Durchschnitts?
+					compAvg = avg;
+					if(bestAvg > compAvg)
+					{	bestAvg = compAvg; bestsName = name; }
+				}
+				else
+				{ printf("Average ergab -1.\n\n"); }
+				
+				char parentD[200];
+				if(getcwd(parentD, sizeof(parentD)) == NULL)
+				{
+					perror("getcwd");
+					printf("Fehler bei getcwd\n");
+				}
+				else
+				{
+					char *h;
+					h = strrchr(parentD, '/');
+					*h = '\0';
+					chdir(parentD);
+				}
+			}
 		}
 	}
 	char name_mark[MAXDATASIZE];
@@ -292,7 +329,6 @@ int groupsBest(char* directory)//int fd)
 
 int findStudent(int fd)
 {
-	//groupsBest("Test");
 	printf("find Student\n");
 	char* directory;
 	directory = recMsg(fd);
@@ -501,7 +537,7 @@ int findGroup(int fd) {
 		while((dirzeiger=readdir(dir)) != NULL)
 		{	
 			char* name = dirzeiger->d_name;
-			if(strcmp(name,".")!=0 && strcmp(name,"..") && strcmp(name,".git"))
+			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
 			{
 				printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
 				printf("Zeiger:%ld\n",pos); 
