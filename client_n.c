@@ -47,8 +47,9 @@ char* manageLogin(int socket){
     //REST OF LOGIN
     //rec=recMsg(socket);
     //if(strcmp(rec,"0")==0){
-    //  return 0;
+    //  return login;
     //}
+    //return rec;
     static char* ret;
     ret = "1";
     return ret;
