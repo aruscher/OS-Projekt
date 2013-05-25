@@ -67,6 +67,47 @@ char* recMsg(int fd){
     return rec;
 }
 
+double average(char* student)
+{
+	char seps[]   = ";";
+	char* token;
+	int countSemikolon = 0;
+	char* input[MAXDATASIZE];
+
+	double notenSumme = 0.0;
+	double notenwert=0.0;
+	double notenDurchschnitt = 0.0;
+
+   	token = strtok(student, seps);	
+	while (token != NULL)
+	{
+		countSemikolon++;
+
+		//save current token
+		input[countSemikolon] = token;	
+		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+		if(countSemikolon >6)
+		{
+			notenwert = atof(token); //String into Double
+			notenSumme += notenwert;
+		}
+      		// Get next token:
+      		token = strtok( NULL, seps );
+   	}
+
+	if(countSemikolon > 6)
+	{
+		//printf("\nNotenAnzahl %i\n", (countSemikolon-5);
+		printf("\nNotenSumme %f\n", notenSumme);
+		notenDurchschnitt = notenSumme/(countSemikolon-6);
+		notenDurchschnitt = (int)(notenDurchschnitt*10)/10.0;
+		printf("\nNotenDurchschnitt %f\n", notenDurchschnitt);
+		
+		return notenDurchschnitt;
+	}
+	return -1;
+}
+
 void createGroup(int fd)
 {
     	char* title = recMsg(fd);
@@ -81,8 +122,13 @@ void createGroup(int fd)
 	return;
 }
 
-int validateLogin(char* login)
+int validateLogin(int fd)
 {
+	printf("Login\n");
+    	char* login = recMsg(fd);
+	if(strcmp(login,"0")==0)
+	{	 sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
+
 	char seps[]   = ";";
 	char* token;
 	int countSemikolon = 0;
@@ -183,49 +229,70 @@ int validateLogin(char* login)
 	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
 }
 
-double average(char* student)
+int groupsBest(char* directory)//int fd)
 {
-	char seps[]   = ";";
-	char* token;
-	int countSemikolon = 0;
-	char* input[MAXDATASIZE];
+	printf("groupsBest\n");
+/*	char* directory;
+    	directory = recMsg(fd);
+	if(strcmp(directory,"0") == 0)
+	{	sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
+*/
+	DIR *dir;
+	struct dirent *dirzeiger;
+ 	/* das Verzeichnis öffnen */
+	if((dir=opendir(directory)) == NULL) 
+	{ printf("Fehler bei opendir\n"); /*sendMsg(fd, "\nStudiengang nicht gefunden.\n");*/ return;}
 
-	double notenSumme = 0.0;
-	double notenwert=0.0;
-	double notenDurchschnitt = 0.0;
+	char students[MAXDATASIZE];
+	sprintf(students, "\nStudiengang %s gefunden. Studiengangsbester: \n", directory);
+	//TODO: andere Ausgabe wenn keine Studenten enthalten
+	//TODO: Namen des Studenten mit ausgeben?
 
-   	token = strtok(student, seps);	
-	while (token != NULL)
-	{
-		countSemikolon++;
+	off_t pos;
+	printf("Im Studiengang %s sind folgende Studenten:\n", directory);
+	/* das komplette Verzeichnis auslesen */
+	
+	char* bestsName;
+	double bestAvg = 0.0;
+	double compAvg = 0.0;
+	double avg = 0.0;
 
-		//save current token
-		input[countSemikolon] = token;	
-		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
-		if(countSemikolon >6)
+	while((dirzeiger=readdir(dir)) != NULL)
+	{	
+		char* name = dirzeiger->d_name;
+		if(strcmp(name,".")!=0 && strcmp(name,"..") && strcmp(name,".git"))
 		{
-			notenwert = atof(token); //String into Double
-			notenSumme += notenwert;
+			printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
+			printf("Zeiger:%ld\n",pos); 
+			if((avg = average(name)) != -1 && bestAvg == 0.0)
+			{ 	bestAvg = avg; bestsName = name;}
+			else if(avg != -1)
+			{
+				//TODO: bei Gleichheit des Durchschnitts?
+				compAvg = avg;
+				if(bestAvg > compAvg)
+				{	bestAvg = compAvg; bestsName = name; }
+			}
+			else
+			{ printf("Average ergab -1.\n\n"); }
 		}
-      		// Get next token:
-      		token = strtok( NULL, seps );
-   	}
-
-	if(countSemikolon > 6)
-	{
-		//printf("\nNotenAnzahl %i\n", (countSemikolon-5);
-		printf("\nNotenSumme %f\n", notenSumme);
-		notenDurchschnitt = notenSumme/(countSemikolon-6);
-		notenDurchschnitt = (int)(notenDurchschnitt*10)/10.0;
-		printf("\nNotenDurchschnitt %f\n", notenDurchschnitt);
-		
-		return notenDurchschnitt;
 	}
-	return -1;
+	char name_mark[MAXDATASIZE];
+	sprintf(name_mark, "Student mit MNR %s und Notendurchschnitt %g", bestsName, bestAvg);
+	strcat(students, name_mark);
+	printf("%s",students);
+		
+	/* Lesezeiger wieder schließen */
+	if(closedir(dir) == -1)
+	{	printf("Fehler beim Schließen von %s\n", directory); }
+		
+	//sendMsg(fd, students);
+	return;
 }
 
 int findStudent(int fd)
 {
+	//groupsBest("Test");
 	printf("find Student\n");
 	char* directory;
 	directory = recMsg(fd);
