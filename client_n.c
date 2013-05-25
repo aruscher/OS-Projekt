@@ -31,17 +31,24 @@ char* recMsg(int socket){
 
 //0 Student, 1 Admin
 int manageLogin(int socket){
-    char* mNr;
+    char* login;
     char* password;
+    char message[MAXDATASIZE];
     printf("Anmeldung auf Notenserver\n");
     printf("#########################\n");
     printf("Benutzername(Mnr): >");
-    scanf("%s",&mNr);
+    scanf("%s",&login);
     printf("\nPasswort: >");
     scanf("%s",&password);
+    sprintf(message,"%s;%s",login,password);
+    sendMsg(socket,message); 
 
-
-
+    char* rec;
+    //REST OF LOGIN
+    //rec=recMsg(socket);
+    //if(strcmp(rec,"0")==0){
+    //  return 0;
+    //}
     return 1;
 }
 
