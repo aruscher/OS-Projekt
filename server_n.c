@@ -275,6 +275,9 @@ int findStudent(int fd)
 			printf("%s\n",datenStudent);
 			fclose(pFile);
 
+			char copyStudent[MAXDATASIZE];
+			strcpy(copyStudent, datenStudent);
+
 			//char* token2;
 			countSemikolon = 0;
 			char* student[MAXDATASIZE];
@@ -291,8 +294,7 @@ int findStudent(int fd)
    			}
 
 			char message[MAXDATASIZE];
-			sprintf(message,"MNR: %s\nPasswort: %s\nVorname: %s\nName: %s\nStudiengang: %s	\nGeburtstag: %s\n",student[1],student[2],student[3],student[4],student[5],student[6]);
-     			sendMsg(fd, message);
+			sprintf(message,"\nMNR: %s\nPasswort: %s\nVorname: %s\nName: %s\nStudiengang: %s	\nGeburtstag: %s\n",student[1],student[2],student[3],student[4],student[5],student[6]);
 
 			if(countSemikolon < 7)
 				sendMsg(fd, message);
@@ -303,21 +305,21 @@ int findStudent(int fd)
 				{
 					strcat(message,"\nNote: ");strcat(message,student[i]);
 				}
-				strcat(message,"\n\n");
-				sendMsg(fd, message);
-			} 
-			
-			double avg = average(datenStudent); //TODO char** übergeben? Durchschnitt ausgeben?
-			if(avg == -1)
-			{
-				printf("Keine Noten vorhanden\n");
-				sendMsg(fd, "\nStudent wurde gefunden. Zukünftig hier Daten des Studenten.\n");
-			}
-			else
-			{
-				sendMsg(fd, "\nStudent wurde gefunden. Zukünftig hier Daten des Studenten.\n");
-			}			
+				strcat(message,"\n");
 
+				double avg = average(copyStudent);
+				printf("Average: %g\n", avg);
+				if(avg != -1)
+				{
+					char formatAvg[50];
+					sprintf(formatAvg, "%g",avg);
+					strcat(message,"Notendurchschnitt: "); 
+					strcat(message,formatAvg);
+					strcat(message,"\n\n");	
+				}
+	
+				sendMsg(fd, message);
+			}			
 		}
 		char parentD[200];
 		if(getcwd(parentD, sizeof(parentD)) == NULL)
@@ -420,23 +422,31 @@ int findGroup(int fd) {
 	{ printf("Fehler bei opendir\n"); sendMsg(fd, "\nStudiengang nicht gefunden.\n");}
 	else
 	{
+		char students[MAXDATASIZE];
+		sprintf(students, "\nStudiengang %s gefunden. Folgende Studenten enthalten: \n", directory);
+		//TODO: andere Ausgabe wenn keine Studenten enthalten
+		//TODO: komplette Daten oder Namen der Studenten mit ausgeben
+
 		off_t pos;
 		printf("Im Studiengang %s sind folgende Studenten:\n", directory);
 		/* das komplette Verzeichnis auslesen */
 		
 		while((dirzeiger=readdir(dir)) != NULL)
 		{	
-			printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); printf("Zeiger:%ld\n",pos); 
+			char* name = dirzeiger->d_name;
+			if(strcmp(name,".")!=0 && strcmp(name,"..") && strcmp(name,".git"))
+			{
+				printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
+				printf("Zeiger:%ld\n",pos); 
+				strcat(students, name); strcat(students, "\n");
+			}
 		}
-
-		//TODO: auch 2 falsche einträge ("." und "..")
-		// vllt daher: if entry name is a symbolic link, a value is unspecified
 		
 		/* Lesezeiger wieder schließen */
 		if(closedir(dir) == -1)
 		{	printf("Fehler beim Schließen von %s\n", directory); }
 		
-		sendMsg(fd, "\nStudiengang gefunden. In Zukunft hier Ausgabe der enthaltenen Studenten.\n");
+		sendMsg(fd, students);
 	}
 	return;
 }
