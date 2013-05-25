@@ -29,6 +29,24 @@ char* recMsg(int socket){
     return rec;
 }
 
+//0 Student, 1 Admin
+int manageLogin(int socket){
+    char* mNr;
+    char* password;
+    printf("Anmeldung auf Notenserver\n");
+    printf("#########################\n");
+    printf("Benutzername(Mnr): >");
+    scanf("%s",&mNr);
+    printf("\nPasswort: >");
+    scanf("%s",&password);
+
+
+
+    return 1;
+}
+
+
+
 //1 is valid, 0 unvalid
 int validStudentInput(char* input){
     if(strchr(input,';')){
@@ -382,7 +400,11 @@ int main(int argc, char *argv[ ]){
        // scanf("%s",&message);
         //sendMsg(sock,message);
         //system("clear");
-		MainMenu(sock);
+        int typ;
+        typ = manageLogin(sock);
+        if(typ==1){
+            MainMenu(sock);
+        }
     	//message[0] = option;
 		//printf(">");
 		//scanf("%s",&message);
