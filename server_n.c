@@ -229,7 +229,7 @@ int validateLogin(int fd)
 	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
 }
 
-int groupsBest(char* int fd)
+int groupsBest(int fd)
 {
 	printf("groupsBest\n");
 	char* directory;
