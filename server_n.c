@@ -244,18 +244,16 @@ char* groupsBest(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 	/*char* directory;
     	directory = recMsg(fd);*/
 	if(strcmp(directory,"0") == 0)
-	{	/*sendMsg(fd, "\nFehler bei der Datenübertragung.\n");*/ return; }
+	{	/*sendMsg(fd, "\nFehler bei der Datenübertragung.\n");*/ return "0"; }
 
 	DIR *dir;
 	struct dirent *dirzeiger;
  	/* das Verzeichnis öffnen */
 	if((dir=opendir(directory)) == NULL) 
-	{ printf("Fehler bei opendir\n"); /*sendMsg(fd, "\nStudiengang nicht gefunden.\n");*/ return;}
+	{ printf("Fehler bei opendir\n"); /*sendMsg(fd, "\nStudiengang nicht gefunden.\n");*/ return "0"; }
 
 	char students[MAXDATASIZE];
 	sprintf(students, "\nStudiengang %s gefunden. Studiengangsbester: \n", directory);
-	//TODO: andere Ausgabe wenn keine Studenten enthalten
-	//TODO: Namen des Studenten mit ausgeben?
 
 	off_t pos;
 	printf("Im Studiengang %s sind folgende Studenten:\n", directory);
@@ -281,7 +279,7 @@ char* groupsBest(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
       				printf("Problem beim Öffnen des Ordners/Datei.\n");
 				perror("chdir");
 				perror("fopen");
-				return -1;
+				return "0";
       				//sendMsg(fd, "\nExestiert nicht.\n");
 			}    
 			else
@@ -299,7 +297,6 @@ char* groupsBest(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 				{ 	bestAvg = avg; bestsName = name; }
 				else if(avg != -1)
 				{
-					//TODO: bei Gleichheit des Durchschnitts?
 					compAvg = avg;
 					if(bestAvg > compAvg)
 					{	bestAvg = compAvg; bestsName = name; }
@@ -339,7 +336,7 @@ char* groupsBest(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 	return bestReturn;
 }
 
-int bestOfAll()
+int bestOfAll(int fd)
 {
 	char* bestsName;
 	char* currentGB;
@@ -397,10 +394,11 @@ int bestOfAll()
 		}
 	}
 	if(bestsName == NULL)
-	{	/*sendMsg(...);*/printf("Keine Noten vorhanden"); return; }
+	{	sendMsg(fd, "Keine Studenten vorhanden.\n"); printf("Keine Noten vorhanden"); return 7; }
 	char name_mark[MAXDATASIZE];
-	sprintf(name_mark, "Bester Student:\nStudent mit MNR %s und Notendurchschnitt %g", bestsName, bestAvg);
+	sprintf(name_mark, "Bester Student:\nMNR: %s und Notendurchschnitt: %g\n", bestsName, bestAvg);
 	printf("%s",name_mark);
+	sendMsg(fd,name_mark);
 }
 
 int findStudent(int fd)
@@ -626,10 +624,10 @@ int findGroup(int fd) {
 		{	printf("Fehler beim Schließen von %s\n", directory); }
 
 		if(found == 0)
-		{	sendMsg(fd, "Keine Studenten enthalten.\n"); sendMsg(fd, "0"); }
-		else
-		{ sendMsg(fd, "0"); }
+		{	sendMsg(fd, "Keine Studenten enthalten.\n"); }
 	}
+	sleep(1);
+ 	sendMsg(fd, "0");
 	return;
 }
 
@@ -749,11 +747,17 @@ void handleMenu(int fd){
         }
         if(strcmp(auswahl,"5")==0){
             addMark(fd);
-        }
+	}
         if(strcmp(auswahl,"6")==0){
+            //TODO: einfügen
+	}
+        if(strcmp(auswahl,"7")==0){
+            bestOfAll(fd);
+        }
+        if(strcmp(auswahl,"8")==0){
             printf("BEENDEN");
         }
-        if(strcmp(auswahl,"7")==0){
+        if(strcmp(auswahl,"9")==0){
             printf("Show Student data");
         }
     }

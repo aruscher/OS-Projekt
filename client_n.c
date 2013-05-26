@@ -87,8 +87,10 @@ void showMainMenu(){
 	printf("2)Student finden\n");
 	printf("3)Studiengang anlegen\n");
 	printf("4)Studiengangsmitglieder anzeigen\n");
-    printf("5)Note hinzufügen\n");
-	printf("6)Beenden\n");
+    	printf("5)Note hinzufügen\n");
+    	printf("6)Studiengangsbesten anzeigen\n");
+    	printf("7)Gesamtbesten anzeigen\n");
+	printf("8)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");
 }
@@ -187,7 +189,7 @@ void addMark(int socket){
     if (strcmp(auswahl,"0")==0){
         return;
     }
-    printf("Note %s",note);
+    printf("Note %s",&note);
     char message[MAXDATASIZE];
     message[0] = '\0';
     strcat(message,backupG);
@@ -311,6 +313,7 @@ void findGroup(int socket)
         return;
     }
     sendMsg(socket,title);
+    printf("Folgende Studenten enthalten:\n");
     char* rec;
     while(strcmp(rec = recMsg(socket),"0") != 0)
 	{/*printf("%s\n", rec);*/}
@@ -333,6 +336,34 @@ void createGroup(int socket){
 //    printf("%s\n", rec);
 }
 
+void groupsBest(int socket)
+{
+    printf("Studiengangsbesten anzeigen\n");
+    printf("---------------\n");
+    printf("0 für Beenden\n");
+    char title[MAXDATASIZE];
+    printf("Bitte geben Sie den gesuchten Studiengang an: >");
+    scanf("%s",&title);
+    if(strcmp(title,"0")==0)
+    {
+        sendMsg(socket,"0");
+        return;
+    }
+    sendMsg(socket,title);
+    printf("Noch keine Ausgabe\n");
+    /*char* rec;
+    rec = recMsg(socket);*/
+}
+
+void bestOfAll(int socket)
+{
+    printf("Gesamtbesten anzeigen\n");
+    printf("---------------\n");
+
+    char* rec;
+    rec = recMsg(socket);
+}
+
 void exitProgramm(){
 	exit(0);
 }
@@ -350,7 +381,9 @@ char MainMenu(int socket){
 			case 3: system("clear");sendMsg(socket,"3");createGroup(socket);return '3';
 			case 4: system("clear");sendMsg(socket,"4");findGroup(socket);return '4';
 			case 5: system("clear");sendMsg(socket,"5");addMark(socket);return '5';
-			case 6: sendMsg(socket,"6");exitProgramm(); break;
+			case 6: system("clear");sendMsg(socket,"6");groupsBest(socket);return '6';
+			case 7: system("clear");sendMsg(socket,"7");bestOfAll(socket);return '7';
+			case 8: sendMsg(socket,"8");exitProgramm(); break;
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
 	
