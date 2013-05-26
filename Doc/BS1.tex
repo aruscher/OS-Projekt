@@ -57,17 +57,17 @@
 		Diese Verzeichnisse werden anhand ihrer Bennenungen unterschieden, z.B.: steht der Ordner ITTI für die Studenten, die der Informationstechnik / Technische Informatik angehören.\\
 		Generell werden Studenten in einer Datei gespeichert, die als Bezeichnung die zughörige Matrikelnummer besitzt. Innerhalb der Datei befinden sich die folgenden Datensätze, durch Simikolons von einander getrennt:\\
 		\begin{itemize}
+			\item Matrikelnummer
 			\item Passwort
 			\item Vorname
 			\item Nachname
-			\item Matrikelnummer
 			\item zugehöriger Studiengang
 			\item Geburtstag
 			\item eine beliebiege Anzahl an Noten
 		\end{itemize}
 		Der Datensatz eines Beispielstudenten sieht folgender Maßen aus:\\
 		 \\
-		mukitkarP;Max;Mustermann;113116119;Informatik;23.05.2013;1.0;1.3;2.7;5.0;1.0\\
+		113116119;mukitkarP;Max;Mustermann;Informatik;23.05.2013;1.0;1.3;2.7;5.0;1.0\\
 		 \\
 		Innerhalb des Programmes werden, bis auf die Noten, die Datensätze als Char-Arrays gespeichert. Wichtig ist es darauf zu achten, dass an letzter Stelle das Terminationszeichen ist. Das Passwort darf aus maximal 10 Zeichen bestehen. Für Vorname, Nachname und der zugehörige Studiengang sind 20+1 Char zur Verwendung unterstützt. Die Matrikelnummer besitzt 9 Stellen. Diese wird folglich in 9+1 Chars vom Client abgefragt. Ähnlich bei dem Geburtstag der in der Form DD.MM.YYYY in 11 Chars gespeichert wird. \\
 		Sowohl die einzelnen Noten, als auch die berechneten Durschnitte sind vom Datentyp Double. In die Datei werden die Noten als Chars der Länge 4 eingetragen, sodass sie immer die folgende Form besitzen X.Y wobei 1<X<5 und Y$\in \{$0,3,7$\}$ ist.\\
@@ -83,23 +83,23 @@
 			
 			\textbf{Studenten der Informatik:}
 			\begin{itemize}
-				\item 123;Tom;Klein;100000010;Informatik;01.01.19901.0;4.0;1.7;3.0
-				\item 234;Max;Mustermann;100000011;Informatik;23.05.2001;1.0;1.3;2.7
-				\item 345;Benjamin;Groß;100000012;Informatik;14.12.1986;1.0;1.3;2.7;3.3;1.7;5.0
+				\item 100000010;123;Tom;Klein;Informatik;01.01.19901.0;4.0;1.7;3.0
+				\item 100000011;234;Max;Mustermann;Informatik;23.05.2001;1.0;1.3;2.7
+				\item 100000012;345;Benjamin;Groß;Informatik;14.12.1986;1.0;1.3;2.7;3.3;1.7;5.0
 			\end{itemize}
 			
 			\textbf{Studenten der ITTI:}
 			\begin{itemize}
-				\item 456;Even;Longer;100000013;ITTI;15.11.1977;1.3;2.7;3.3;1.7;5.0;1.0
-				\item 567;Very;Long;100000014;ITTI;12.05.1993;1.0;1.3;2.7;1.0;5.0;1.0;1.0;1.0
-				\item 678;Alfons;Hatler;100000015;ITTI;14.03.1989;1.0;1.0;1.0;1.0
+				\item 100000013;456;Even;Longer;ITTI;15.11.1977;1.3;2.7;3.3;1.7;5.0;1.0
+				\item 100000014;567;Very;Long;ITTI;12.05.1993;1.0;1.3;2.7;1.0;5.0;1.0;1.0;1.0
+				\item 100000015;678;Alfons;Hatler;ITTI;14.03.1989;1.0;1.0;1.0;1.0
 			\end{itemize}
 			
 			\textbf{Studenten der Elektrotechnik:}
 			\begin{itemize}
-				\item 789;John;McClane;100000016;Elektrotechnik;24.12.1966;1.3;3.7;5.0;4.0
-				\item 890;Hans;Gruber;100000017;Elektrotechnik;15.07.1991;1.3;5.0;2.7;1.0;4.0;1.7;3.0;2.0
-				\item 901;Holly;McClane;100000018;Elektrotechnik;30.08.1988;1.7;1.3;1.3;1.7;1.0;1.7;1.7
+				\item 100000016;789;John;McClane;Elektrotechnik;24.12.1966;1.3;3.7;5.0;4.0
+				\item 100000017;890;Hans;Gruber;Elektrotechnik;15.07.1991;1.3;5.0;2.7;1.0;4.0;1.7;3.0;2.0
+				\item 100000018;901;Holly;McClane;Elektrotechnik;30.08.1988;1.7;1.3;1.3;1.7;1.0;1.7;1.7
 			\end{itemize}
 		
 	\subsection{Umzusetztende Funktionalitäten}
