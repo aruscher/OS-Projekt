@@ -67,6 +67,13 @@ char* recMsg(int fd){
     return rec;
 }
 
+//0 for Student, 1 for Admin
+int handleLogin(int fd){
+
+
+    return 1;
+}
+
 double average(char* student)
 {
 	char seps[]   = ";";
@@ -511,8 +518,8 @@ int addMark(int fd)
 {
 	printf("add Mark\n");
 
-    	char* directory;
-    	directory = recMsg(fd);
+    char* directory;
+   	directory = recMsg(fd);
 	char* student;
 
 	char seps[]   = ";";
@@ -737,6 +744,12 @@ void handleMenu(int fd){
         }
         if(strcmp(auswahl,"5")==0){
             addMark(fd);
+        }
+        if(strcmp(auswahl,"6")==0){
+            printf("BEENDEN");
+        }
+        if(strcmp(auswahl,"7")==0){
+            printf("Show Student data");
         }
     }
 }
