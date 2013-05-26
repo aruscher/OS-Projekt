@@ -237,11 +237,12 @@ int validateLogin(int fd)
 	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
 }
 
-int groupsBest(int fd)
+char* groupsBest(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 {
 	printf("groupsBest\n");
-	char* directory;
-    	directory = recMsg(fd);
+	static char bestReturn[MAXDATASIZE];
+	/*char* directory;
+    	directory = recMsg(fd);*/
 	if(strcmp(directory,"0") == 0)
 	{	/*sendMsg(fd, "\nFehler bei der Datenübertragung.\n");*/ return; }
 
@@ -322,17 +323,83 @@ int groupsBest(int fd)
 			}
 		}
 	}
+	if(bestsName == NULL)
+	{ return "0"; }
 	char name_mark[MAXDATASIZE];
 	sprintf(name_mark, "Student mit MNR %s und Notendurchschnitt %g", bestsName, bestAvg);
 	strcat(students, name_mark);
 	printf("%s",students);
-		
+	
+	sprintf(bestReturn, "%s;%g", bestsName,bestAvg);	//TODO: alle returns hierfür checken
 	/* Lesezeiger wieder schließen */
 	if(closedir(dir) == -1)
 	{	printf("Fehler beim Schließen von %s\n", directory); }
 		
 	//sendMsg(fd, students);
-	return;
+	return bestReturn;
+}
+
+int bestOfAll()
+{
+	char* bestsName;
+	char* currentGB;
+	double bestAvg = 0.0;
+	double compAvg = 0.0;
+
+	char seps[]   = ";";
+	char* token;
+	int countSemikolon = 1;
+	char* input[MAXDATASIZE];
+
+	DIR *folder = opendir("./");
+	DIR *sfolder;
+	struct stat attribut;
+	struct dirent *mainfile;
+	struct dirent *subfile;
+	while((mainfile=readdir(folder))!=NULL)
+	{
+		stat(mainfile->d_name,&attribut);
+		if( attribut.st_mode & S_IFDIR)
+		{
+			char* name = mainfile->d_name;
+			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
+			{
+				countSemikolon = 1;
+				currentGB = groupsBest(name);
+				if((strcmp(currentGB, "0")) !=0)
+				{
+   					token = strtok(currentGB, seps);	
+					while (token != NULL)
+					{
+						//save current token
+						input[countSemikolon] = token;	
+						printf("token: %s\n", token);
+      						// Get next token:
+      						token = strtok( NULL, seps );
+
+						countSemikolon++;
+			   		}
+					if((strcmp(input[2], "-1")) != 0 && bestAvg == 0.0)
+					{ 	bestAvg = atof(input[2]); bestsName = input[1]; }
+					else if((strcmp(input[2], "-1")) != 0)
+					{
+						compAvg = atof(input[2]);
+						if(bestAvg > compAvg)
+						{	bestAvg = compAvg; bestsName = input[1];}
+					}
+					else
+					{ printf("Average ergab -1.\n\n"); }
+				}
+				printf("INPUT 1: %s, BESTS NAME: %s\n", input[1],bestsName);
+				//TODO: AVG richtig aber Mnr ist letzte und nicht vom besten
+			}
+		}
+	}
+	if(bestsName == NULL)
+	{	/*sendMsg(...);*/printf("Keine Noten vorhanden"); return; }
+	char name_mark[MAXDATASIZE];
+	sprintf(name_mark, "Bester Student:\nStudent mit MNR %s und Notendurchschnitt %g", bestsName, bestAvg);
+	printf("%s",name_mark);
 }
 
 int findStudent(int fd)
