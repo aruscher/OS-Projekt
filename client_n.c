@@ -25,7 +25,7 @@ char* recMsg(int socket){
     int msg;
     msg = recv(socket,rec,MAXDATASIZE-1,0);
     rec[msg]='\0';
-    printf("\nrecMSG: %s\n",rec);
+    printf("recMSG:\n %s\n",rec);
     return rec;
 }
 
@@ -293,7 +293,7 @@ void createStudent(int socket){
 
 void findGroup(int socket)
 {
-    char msg[MAXDATASIZE];
+    char* msg;
     printf("Studiengangsmitglieder finden\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
