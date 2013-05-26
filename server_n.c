@@ -132,7 +132,7 @@ void createGroup(int fd)
 int validateLogin(int fd)
 {
 	printf("Login\n");
-    	char* login = recMsg(fd);
+    char* login = recMsg(fd);
 	if(strcmp(login,"0")==0)
 	{	 sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
 
@@ -153,7 +153,7 @@ int validateLogin(int fd)
       		token = strtok( NULL, seps );
    	}
 
-    	DIR *folder = opendir("./");
+    DIR *folder = opendir("./");
 	DIR *sfolder;
 	struct stat attribut;
 	struct dirent *mainfile;
@@ -173,11 +173,11 @@ int validateLogin(int fd)
    						if((chdir(mainfile->d_name) == -1) || 
 							((pFile = fopen(input[1], "r")) == NULL))      
 						{
-      							printf("Problem beim Öffnen des Ordners/Datei.\n");
+      						printf("Problem beim Öffnen des Ordners/Datei.\n");
 							perror("chdir");
 							perror("fopen");
-							return -1;
-      							//sendMsg(fd, "\nExestiert nicht.\n");
+      					    sendMsg(fd, "-1");
+                            return -1;
 						}
 						else
 						{
@@ -202,7 +202,7 @@ int validateLogin(int fd)
       								token = strtok( NULL, seps );
    							}
 							if(strcmp(input[2],student[2])==0)
-							{printf("PASSWORD SUCCESS!"); return 0;}
+							{printf("PASSWORD SUCCESS!"); sendMsg(fd,"0");return 0;}
 							else
 							{printf("PASSWORD WRONG!");}
 
@@ -231,6 +231,7 @@ int validateLogin(int fd)
 	printf("After traversal\n");
 	
 	printf("Benutzer existiert nicht.\n");
+    sendMsg(fd,"-1");
 	return -1;
 
 	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
