@@ -148,7 +148,7 @@ int validateLogin(int fd)
 
 		//save current token
 		input[countSemikolon] = token;	
-		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+		printf("token: %s\n", token);
       		// Get next token:
       		token = strtok( NULL, seps );
    	}
@@ -382,14 +382,15 @@ int bestOfAll()
 					{ 	bestAvg = atof(input[2]); bestsName = input[1]; }
 					else if((strcmp(input[2], "-1")) != 0)
 					{
+						printf("\nINPUT 1: %s, BESTS NAME: %s\n\n", input[1],bestsName);
 						compAvg = atof(input[2]);
 						if(bestAvg > compAvg)
 						{	bestAvg = compAvg; bestsName = input[1];}
+						printf("\nINPUT 1: %s, BESTS NAME: %s\n\n", input[1],bestsName);
 					}
 					else
 					{ printf("Average ergab -1.\n\n"); }
 				}
-				printf("INPUT 1: %s, BESTS NAME: %s\n", input[1],bestsName);
 				//TODO: AVG richtig aber Mnr ist letzte und nicht vom besten
 			}
 		}
@@ -587,6 +588,7 @@ int addMark(int fd)
 int findGroup(int fd) {
 
 	printf("find Group\n");
+	bool found = false;
     	char* directory;
     	directory = recMsg(fd);
 	if(strcmp(directory,"0") == 0)
@@ -600,10 +602,7 @@ int findGroup(int fd) {
 	else
 	{
 		char students[MAXDATASIZE];
-		sprintf(students, "\nStudiengang %s gefunden. Folgende Studenten enthalten: \n", directory);
-		//TODO: andere Ausgabe wenn keine Studenten enthalten
-		//TODO: komplette Daten oder Namen der Studenten mit ausgeben
-
+		//sprintf(students, "\nStudiengang %s gefunden. Folgende Studenten enthalten: \n", directory);
 		off_t pos;
 		printf("Im Studiengang %s sind folgende Studenten:\n", directory);
 		/* das komplette Verzeichnis auslesen */
@@ -613,17 +612,22 @@ int findGroup(int fd) {
 			char* name = dirzeiger->d_name;
 			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
 			{
+				found = true;
 				printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
 				printf("Zeiger:%ld\n",pos); 
-				strcat(students, name); strcat(students, "\n");
+				sprintf(students, "%s\n",name);
+				sendMsg(fd, students);
 			}
 		}
 		
 		/* Lesezeiger wieder schließen */
 		if(closedir(dir) == -1)
 		{	printf("Fehler beim Schließen von %s\n", directory); }
-		
-		sendMsg(fd, students);
+
+		if(found == false)
+		{	sendMsg(fd, "Keine Studenten enthalten.\n"); }
+		else
+		{ sendMsg(fd, "0"); }
 	}
 	return;
 }
