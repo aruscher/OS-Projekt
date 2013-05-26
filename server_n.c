@@ -589,7 +589,7 @@ int addMark(int fd)
 int findGroup(int fd) {
 
 	printf("find Group\n");
-	bool found = false;
+	int found = 0;
     	char* directory;
     	directory = recMsg(fd);
 	if(strcmp(directory,"0") == 0)
@@ -613,7 +613,7 @@ int findGroup(int fd) {
 			char* name = dirzeiger->d_name;
 			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
 			{
-				found = true;
+				found = 1;
 				printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
 				printf("Zeiger:%ld\n",pos); 
 				sprintf(students, "%s\n",name);
@@ -625,8 +625,8 @@ int findGroup(int fd) {
 		if(closedir(dir) == -1)
 		{	printf("Fehler beim Schließen von %s\n", directory); }
 
-		if(found == false)
-		{	sendMsg(fd, "Keine Studenten enthalten.\n"); }
+		if(found == 0)
+		{	sendMsg(fd, "Keine Studenten enthalten.\n"); sendMsg(fd, "0"); }
 		else
 		{ sendMsg(fd, "0"); }
 	}

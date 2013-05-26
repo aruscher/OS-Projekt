@@ -293,6 +293,7 @@ void createStudent(int socket){
 
 void findGroup(int socket)
 {
+    char msg[MAXDATASIZE];
     printf("Studiengangsmitglieder finden\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
@@ -305,7 +306,8 @@ void findGroup(int socket)
         return;
     }
     sendMsg(socket,title);
-    recMsg(socket);
+    //msg = recMsg(socket);
+    while(strcmp(msg = recMsg(socket),"0") != 0){}
 }
 
 void createGroup(int socket){
