@@ -72,7 +72,8 @@
 		Innerhalb des Programmes werden, bis auf die Noten, die Datensätze als Char-Arrays gespeichert. Wichtig ist es darauf zu achten, dass an letzter Stelle das Terminationszeichen ist. Das Passwort darf aus maximal 10 Zeichen bestehen. Für Vorname, Nachname und der zugehörige Studiengang sind 20+1 Char zur Verwendung unterstützt. Die Matrikelnummer besitzt 9 Stellen. Diese wird folglich in 9+1 Chars vom Client abgefragt. Ähnlich bei dem Geburtstag der in der Form DD.MM.YYYY in 11 Chars gespeichert wird. \\
 		Sowohl die einzelnen Noten, als auch die berechneten Durschnitte sind vom Datentyp Double. In die Datei werden die Noten als Chars der Länge 4 eingetragen, sodass sie immer die folgende Form besitzen X.Y wobei 1<X<5 und Y$\in \{$0,3,7$\}$ ist.\\
 		\subsubsection{Beipieldatein}
-			Da zu Laufzeiten des Programms sowohl Gruppen als auch Studenten mit einer beliebigen Anzahl an Noten hinzugefügt werden, decken unsere Beispieldatein den geforderten Teil ab:\\
+			Da zu Laufzeiten des Programms sowohl Gruppen als auch Studenten mit einer beliebigen Anzahl an Noten hinzugefügt werden, decken unsere Beispieldatein den geforderten Teil ab:
+			
 			\textbf{Gruppen:}
 			\begin{itemize}
 				\item Informatik
@@ -122,14 +123,29 @@
 			\end{description}
 \section{Praktische Umsetzung}
 	\subsection{Menü}
-		Die in Kapitel 2.4 Beschriebenen Funktionalitäten führen zu zwei unterschiedlichen Menü-Formen. Abhängig von den Rechten, die dem Nutzer nach dem Login zugeteilt werden, wird ein entsprechendes Menü angezeigt.
+		Die in Kapitel 2.4 Beschriebenen Funktionalitäten führen zu zwei unterschiedlichen Menü-Formen. Abhängig von den Rechten, die dem Nutzer nach dem Login zugeteilt werden, wird ein entsprechendes Menü angezeigt. 
 		\begin{center}
 		\includegraphics[scale=0.6]{menue.jpg}
 		\end{center}
 	\subsection{Client}
-
+		Der Client bietet dem Nutzer die Möglichkeit anhand eines Menüs Funktionen auszuwählen. Bei Auswahl werden gegebenenfalls Daten vom Nutzer angefordert und eine Mitteilung über das Ergebnis gegeben. Die Eingaben des Nutzers werden bis zu einem gewissen Grad validiert. Beispielsweise wird verhindert, dass bei der Eingabe Simikolons versendet werden können, da zusätzliche in CSV-Datein und deren Auswertung zu Fehlern führen werden.\\
+		In unserem Programm ist es die Hauptaufgabe des Clients eine Schnittstelle zwischen Nutzer und Server darzustellen.
 	\subsection{Server}
-
+		Die Aufgabe des Servers ist es, auf die Befehle des Clients zu reagieren. Der Client sendet hierfür die Nummer der Option, die der Nutzer ausgewählt hat. Der Server empfängt diese und reagiert dem entsprechend. Eine große Rolle spielt der Dateizugriff auf Server Seite, da dieser hauptsächlich Dateien schreibt oder ausliest. Anschließend werden die Informationen aufbereitet und an den Client übermittelt. Wie in unserem Projekt dieser Umgang mit Dateien ermöglicht wird, ist wie folgt:
+		\subsubsection{Dateien auslesen}
+			Da Studiengänge durch Verzeichnisse umgestezt werden, ist es elementar notwendig diese Ordner zu öffnen, um Zugriff auf eine spezielle Studentendatei zu erhalten. Danach wird die Datei vollständig ausgelesen und innerhalb des Programmes zur weiteren Bearbeitung hinterlegt. Die Daten über den Studenten befinden sich jetzt in einem String gespeichert, wobei die Datensätze durch Simikolons getrennt sind. Es ist nun nötig den String aufzugliedern und die benötigten Daten zu extrahieren. Die ermittelten Daten stehen daraufhin zur weiteren Verarbeitung zur Verfügung.
+			\begin{description}
+				\item[Verzeichnissinhaltsausgabe] wird durch die Funktion opendir() ermöglicht. Der Server erhält den Namen des Verzeichnisses, das geöffnet werden soll und nutzt dafür opendir(). Als Rückgabe erhalten wir einen Pointer, der auf den ersten Eintrag zeigt. Bestimmte Datein, die keine Studenten repräsentieren werden ignoriert. Alle anderen werden nacheinander ausgegeben. Realisiert wird dies in der Funktion findGroup(). An den Server werden die Studenten übermittelt und dort ausgegeben.
+				\item[Verzeichnisse öffnen] ist durch chdir() möglich. Der Client übermittelt dem Server welches Verzeichnis geöffnet werden soll. Sollte das öffnen nicht möglich sein, wird dies dem Client umgehend mitgeteilt, die Funktion wird beendet und der Client bekommt die Möglichkeit im Hauptmenü einen neuen Vorgang zu starten. Ist es jedoch möglich gewesen in ein Verzeichnis zu wechseln, kann nun auf alle Dateien innerhalb dieses zugegriffen werden. Wichtig ist, dass im Anschluss daran wieder in das darüberliegende Verzeichniss zurück gewechselt wird. Andernfalls kann es zu Fehlern kommen, da entsprechende andere Studiengänge sich nicht in dem vorher ausgewählten befinden.
+				\item[Dateien auslesen] wird durch fscanf(Quelle,Formatierung,Ziel) umgesetzt.
+				\item[String aufteilen] realiseren wir mit  strtok(Quellstring, delimiters);. Mit strtok kann ein String anhand von Trennzeichen zerteilt und die einzelnen Abschnitte herausgelesen werden. Die Trennzeichen werden im Parameter delimiter (Begrenzungszeichen, Separator) übergeben - in unserem Fall das Simikolon. Die einzelnen Datensegmente werden in einen anderen String gespeichert, der in Abschnitte unterteilt ist. \\
+				\textbf{FABIENNE HIER BITTE NOCHMAL GRÜNDLICH NACHLESEN!!!}
+			\end{description}
+		\subsubsection{Dateien schreiben}	
+			Das schreiben und damit das Anlegen neuer Dateien spielt beim Hinzufügen neuer Studenten bzw. dem Hinzufügen einzelner Noten eine Rolle. Um einen Studenten zu erstellen, muss der ausgewählte Studiengang als aktuelles Verzeichniss gewählt werden. Wenn ein neuer Student angelegt werden soll, werden zuerst noch verschiedene Fehlerfehle abgefangen: Beispielsweise falsches Verzeichnis, Fehler bei Vergabe der Matrikelnummer, etc. \\
+			Kam es zu keinen Fehlern wird mit fopen() eine Datei erstellt. Durch fprintf(NeueDatei,Formatierungsstring, MatrikelNummer,Daten) wird in Datei geschrieben. Abschließend wird die Datei geschlossen und wieder in das nächst höhere Verzeichniss zurückgewechselt.
+		\subsubsection{Sonstige Funktionen}
+			Bisher nicht genauer spezifizierte Funktionen werden mit den gleichen Methoden, wie vorangehend beschrieben, umgesetzt. Ziel und Zweck dieser Funtkionalitäten sind im Nutzerhandbuch beschrieben.
 \section{Nutzerhandbuch}
 	\subsection{Inbetriebnahme}
 		Als Betriebssystem wird eine Linux Distribution vorrausgesetzt. Um das C Programm zu kompilieren, führt der Nutzer im Terminal $\glqq$make install$\grqq$ aus. Wichtig ist, dass er sich im richtigen Verzeichnis befindet - in dem sich auch das Skrip $\glqq$makefile$\grqq$ befindet. In zwei verschiedenen Terminals werden nun die ausführbaren Datein gestartet.\\
