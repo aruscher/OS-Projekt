@@ -40,10 +40,8 @@ char* manageLogin(int socket){
     scanf("%s",&login);
     printf("\nPasswort: >");
     scanf("%s",&password);
-    sprintf(message,"%s;%s",login,password);
-    sendMsg(socket,message); 
-
-    char* rec;
+    //sprintf(message,"%s;%s",login,password);
+    //sendMsg(socket,message); 
     //REST OF LOGIN
     //rec=recMsg(socket);
     //if(strcmp(rec,"0")==0){
@@ -52,6 +50,7 @@ char* manageLogin(int socket){
     //return rec;
     static char* ret;
     ret = "1";
+    printf("Login Done");
     return ret;
 }
 
