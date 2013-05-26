@@ -135,7 +135,9 @@ void findStudent(int socket){
 
     printf("Message: %s\n",message);
     sendMsg(socket,message);
-    recMsg(socket);
+    char* rec;
+    rec = recMsg(socket);
+    //printf("%s\n", rec);
 }
 
 void addMark(int socket){
@@ -196,7 +198,9 @@ void addMark(int socket){
 
     printf("Message: %s\n",message);
     sendMsg(socket,message);
-    recMsg(socket);
+    char* rec;
+    rec = recMsg(socket);
+    //printf("%s\n", rec);
 }
 
 void createStudent(int socket){
@@ -288,12 +292,13 @@ void createStudent(int socket){
     char message[MAXDATASIZE];
     sprintf(message,"%s;%s;%s;%s;%s",passwort,vorname,nachname,backup2,backup1);
     sendMsg(socket,message);	
-    recMsg(socket);
+    char* rec;
+    rec = recMsg(socket);
+    //printf("%s\n", rec);
 }
 
 void findGroup(int socket)
 {
-    char* msg;
     printf("Studiengangsmitglieder finden\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
@@ -306,8 +311,9 @@ void findGroup(int socket)
         return;
     }
     sendMsg(socket,title);
-    //msg = recMsg(socket);
-    while(strcmp(msg = recMsg(socket),"0") != 0){}
+    char* rec;
+    while(strcmp(rec = recMsg(socket),"0") != 0)
+	{/*printf("%s\n", rec);*/}
 }
 
 void createGroup(int socket){
@@ -322,7 +328,9 @@ void createGroup(int socket){
         return;
     }
     sendMsg(socket,title);
-    recMsg(socket);
+    char* rec;
+    rec = recMsg(socket);
+//    printf("%s\n", rec);
 }
 
 void exitProgramm(){
