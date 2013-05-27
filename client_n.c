@@ -31,27 +31,24 @@ char* recMsg(int socket){
 
 //mNr if Student, 1 Admin, -1 for invalid
 char* manageLogin(int socket){
-    char* login;
-    char* password;
+    char login[20];
+    char password[20];
     char message[MAXDATASIZE];
+    char* rec;
+    int check;
     printf("Anmeldung auf Notenserver\n");
     printf("#########################\n");
     printf("Benutzername(Mnr): >");
     scanf("%s",&login);
-    printf("\nPasswort: >");
+    printf("Login: %s",login);
+    printf("Passwort: >"); 
     scanf("%s",&password);
-    //sprintf(message,"%s;%s",login,password);
-    //sendMsg(socket,message); 
+    sprintf(message,"%s;%s",login,password);
+    sendMsg(socket,message); 
     //REST OF LOGIN
-    //rec=recMsg(socket);
-    //if(strcmp(rec,"0")==0){
-    //  return login;
-    //}
-    //return rec;
-    static char* ret;
-    ret = "1";
-    printf("Login Done");
-    return ret;
+    rec=recMsg(socket);
+    printf("Rec: %s",rec);
+    return rec;
 }
 
 
@@ -481,6 +478,7 @@ int main(int argc, char *argv[ ]){
 	char message[MAXDATASIZE];
     char* typ;
     typ = manageLogin(sock);
+    printf("TYP: %s",&typ);
 	while(run){
        // scanf("%s",&message);
         //sendMsg(sock,message);

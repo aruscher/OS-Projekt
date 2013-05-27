@@ -35,7 +35,7 @@ int checkStudent(char* mNr){
 			char* name = mainfile->d_name;
 			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
 				printf("DIR: %s\n",mainfile->d_name);
-				sfolder = opendir(mainfile->d_name);
+                sfolder = opendir(mainfile->d_name);
 				while((subfile=readdir(sfolder))!=NULL){
 					char* subname = subfile->d_name;
 					if(strcmp(subname,mNr)==0){
@@ -69,8 +69,18 @@ char* recMsg(int fd){
 
 //0 for Student, 1 for Admin
 int handleLogin(int fd){
-
-
+    int indicator = validateLogin(fd);
+    printf("Indi: %d\n",indicator);
+    if(indicator==-1){
+        printf("Error in Anmeldung\n");
+        sendMsg(fd,"-1");
+    } else if (indicator==0){
+        printf("Anmeldung Student erfolgreich\n");
+        sendMsg(fd,"0");
+    } else {
+        printf("Anmeldung Admin erfolgreich\n");
+        sendMsg(fd,"1");
+    }
     return 1;
 }
 
@@ -90,7 +100,7 @@ double average(char* student)
 	{
 		countSemikolon++;
 
-		//save current token
+        //save current token
 		input[countSemikolon] = token;	
 		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
 		if(countSemikolon >6)
@@ -132,7 +142,8 @@ void createGroup(int fd)
 int validateLogin(int fd)
 {
 	printf("Login\n");
-    char* login = recMsg(fd);
+    char* login = recMsg(fd); 
+    printf("Login Request: %s\n",login);
 	if(strcmp(login,"0")==0)
 	{	 sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
 
@@ -149,8 +160,8 @@ int validateLogin(int fd)
 		//save current token
 		input[countSemikolon] = token;	
 		printf("token: %s\n", token);
-      		// Get next token:
-      		token = strtok( NULL, seps );
+        // Get next token:
+        token = strtok( NULL, seps );
    	}
 
     DIR *folder = opendir("./");
@@ -176,7 +187,6 @@ int validateLogin(int fd)
       						printf("Problem beim Öffnen des Ordners/Datei.\n");
 							perror("chdir");
 							perror("fopen");
-      					    sendMsg(fd, "-1");
                             return -1;
 						}
 						else
@@ -201,8 +211,14 @@ int validateLogin(int fd)
       								// Get next token:
       								token = strtok( NULL, seps );
    							}
-							if(strcmp(input[2],student[2])==0)
-							{printf("PASSWORD SUCCESS!"); sendMsg(fd,"0");return 0;}
+							if(strcmp(input[2],student[2])==0){
+                                printf("PASSWORD SUCCESS!\n");
+                                if(strcmp(name,"Admin")==0){
+                                        printf("ADMIN LOGIN\n");
+                                        return 1;
+                                }
+                                return 0;
+                            }
 							else
 							{printf("PASSWORD WRONG!");}
 
@@ -837,11 +853,11 @@ int main(int argc, char *argv[ ]){
 	}
 
 	/* clean all the dead processes */
-	//sa.sa_handler = sigchld_handler;
-	//sigemptyset(&sa.sa_mask);
-	//sa.sa_flags = SA_RESTART;
+    //sa.sa_handler = sigchld_handler;
+    //sigemptyset(&sa.sa_mask);
+    //sa.sa_flags = SA_RESTART;
 
-	/* start accept loop */
+    /* start accept loop */
     int socklen = sizeof(struct sockaddr_in);
     if((new_fd=accept(sock, (struct sockaddr *)&their_addr, &socklen))==-1){
         perror("CANT ACCEPT CONNECTION");
@@ -849,7 +865,7 @@ int main(int argc, char *argv[ ]){
     } else {
         printf("SOCKET Accept\n");
     }
-
+    handleLogin(new_fd);
     handleMenu(new_fd);
     
 
