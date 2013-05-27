@@ -347,7 +347,6 @@ void groupsBest(int socket)
         return;
     }
     sendMsg(socket,title);
-    printf("Noch keine Ausgabe\n");
     char* rec;
     rec = recMsg(socket);
 }

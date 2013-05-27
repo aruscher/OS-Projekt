@@ -259,7 +259,6 @@ int validateLogin(int fd)
 
 char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 {
-	printf("groupsBest\n");
 	static char bestReturn[MAXDATASIZE];
 	/*char* directory;
     	directory = recMsg(fd);*/
@@ -354,8 +353,7 @@ char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 
 	if(bestsName == NULL)
 	{	return "0"; }
-	
-	char name_mark[MAXDATASIZE];	
+		
 	sprintf(bestReturn, "%s;%g", bestsName,bestAvg);
 	return bestReturn;
 }
