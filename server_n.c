@@ -218,6 +218,7 @@ int validateLogin(int fd)
                                 printf("PASSWORD SUCCESS!\n");
                                 if(strcmp(name,"Admin")==0){
                                         printf("ADMIN LOGIN\n");
+                                        chdir("..");
                                         return 1;
                                 }
                                 return 0;
