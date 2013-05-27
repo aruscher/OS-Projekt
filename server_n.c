@@ -257,32 +257,28 @@ int validateLogin(int fd)
 	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
 }
 
-char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
+char* gBestHelp(char* directory)
 {
 	static char bestReturn[MAXDATASIZE];
-	/*char* directory;
-    	directory = recMsg(fd);*/
+
 	if(strcmp(directory,"0") == 0)
-	{	/*sendMsg(fd, "\nFehler bei der Datenübertragung.\n");*/ return "0"; }
+	{	return "0"; }
 
 	DIR *dir;
 	struct dirent *dirzeiger;
  	/* das Verzeichnis öffnen */
 	if((dir=opendir(directory)) == NULL) 
-	{ printf("Fehler bei opendir\n"); /*sendMsg(fd, "\nStudiengang nicht gefunden.\n");*/ return "0"; }
-
-	char students[MAXDATASIZE];
-	sprintf(students, "\nStudiengang %s gefunden. Studiengangsbester: \n", directory);
+	{ 	printf("Fehler bei opendir\n"); return "0"; }
 
 	off_t pos;
 	printf("Im Studiengang %s sind folgende Studenten:\n", directory);
-	/* das komplette Verzeichnis auslesen */
 	
 	char* bestsName;
 	double bestAvg = 0.0;
 	double compAvg = 0.0;
 	double avg = 0.0;
 
+	/* das komplette Verzeichnis auslesen */
 	while((dirzeiger=readdir(dir)) != NULL)
 	{	
 		char* name = (*dirzeiger).d_name;
@@ -299,7 +295,6 @@ char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 				perror("chdir");
 				perror("fopen");
 				return "0";
-      				//sendMsg(fd, "\nExestiert nicht.\n");
 			}    
 			else
 			{
@@ -320,10 +315,8 @@ char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 					if(bestAvg > compAvg)
 					{	bestAvg = compAvg; bestsName = name; }
 				}
-				else
-				{ printf("Average ergab -1.\n\n"); }
 				
-				char parentD[200];
+				char parentD[200];//TODO: einfachere Version verwenden ".."
 				if(getcwd(parentD, sizeof(parentD)) == NULL)
 				{
 					perror("getcwd");
@@ -339,14 +332,6 @@ char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 			}
 		}
 	}
-	if(bestsName == NULL)
-	{ return "0"; }
-	char name_mark[MAXDATASIZE];
-	sprintf(name_mark, "Student mit MNR %s und Notendurchschnitt %g", bestsName, bestAvg);
-	strcat(students, name_mark);
-	printf("%s",students);
-	
-	sprintf(bestReturn, "%s;%g", bestsName,bestAvg);	//TODO: alle returns hierfür checken
 	/* Lesezeiger wieder schließen */
 	if(closedir(dir) == -1)
 	{	printf("Fehler beim Schließen von %s\n", directory); }
@@ -395,7 +380,7 @@ int groupsBest(int fd)
 int bestOfAll(int fd)
 {
 	//TODO: Fehlermeldungen?
-	char* bestsName;
+	char bestsName[10];
 	char* currentGB;
 	double bestAvg = 0.0;
 	double compAvg = 0.0;
@@ -422,6 +407,7 @@ int bestOfAll(int fd)
 				currentGB = gBestHelp(name);
 				if((strcmp(currentGB, "0")) !=0)
 				{
+					printf("\nCURRENT GBEST: %s\n\n", currentGB);
    					token = strtok(currentGB, seps);	
 					while (token != NULL)
 					{
@@ -434,24 +420,21 @@ int bestOfAll(int fd)
 						countSemikolon++;
 			   		}
 					if((strcmp(input[2], "-1")) != 0 && bestAvg == 0.0)
-					{ 	bestAvg = atof(input[2]); bestsName = input[1]; }
+					{ 	strcpy(bestsName, input[1]); bestAvg = atof(input[2]); }
 					else if((strcmp(input[2], "-1")) != 0)
 					{
-						printf("\nINPUT 1: %s, BESTS NAME: %s\n\n", input[1],bestsName);
 						compAvg = atof(input[2]);
 						if(bestAvg > compAvg)
-						{	bestAvg = compAvg; bestsName = input[1];}
-						printf("\nINPUT 1: %s, BESTS NAME: %s\n\n", input[1],bestsName);
+						{	strcpy(bestsName, input[1]); bestAvg = compAvg; }
 					}
 					else
 					{ printf("Average ergab -1.\n\n"); }
 				}
-				//TODO: AVG richtig aber Mnr ist letzte und nicht vom besten
 			}
 		}
 	}
 	if(bestsName == NULL)
-	{	sendMsg(fd, "Keine Studenten vorhanden.\n"); printf("Keine Noten vorhanden"); return 7; }
+	{	sendMsg(fd, "Keine Noten vorhanden.\n"); return 7; }
 	char name_mark[MAXDATASIZE];
 	sprintf(name_mark, "Bester Student:\nMNR: %s und Notendurchschnitt: %g\n", bestsName, bestAvg);
 	printf("%s",name_mark);
@@ -577,7 +560,7 @@ int addMark(int fd)
 {
 	printf("add Mark\n");
 
-    char* directory;
+    	char* directory;
    	directory = recMsg(fd);
 	char* student;
 
