@@ -39,9 +39,9 @@ char* manageLogin(int socket){
     printf("Anmeldung auf Notenserver\n");
     printf("#########################\n");
     printf("Benutzername(Mnr): >");
-    scanf("%s",&login);
+    scanf("%s",login);
     printf("\nPasswort: >");
-    scanf("%s",&password);
+    scanf("%s",password);
     sprintf(message,"%s;%s",login,password);
     sendMsg(socket,message); 
     //REST OF LOGIN
@@ -97,17 +97,17 @@ void findStudent(int socket){
     printf("0 für Beenden\n");
     char mNr[11];
     char studiengang[20];
-    char auswahl[1];
+    char auswahl[2];
 
     printf("Studiengang (max.20): >");
-    scanf("%s",&studiengang);
+    scanf("%s",studiengang);
     if(strcmp(studiengang,"0")==0){
         sendMsg(socket,"0");
         return;
     }
 
     printf("Matrikelnummer (max.9): >");
-    scanf("%s",&mNr);
+    scanf("%s",mNr);
     if(strcmp(mNr,"0")==0){
         sendMsg(socket,"0");
         return;
@@ -120,7 +120,7 @@ void findStudent(int socket){
     printf("Studiengang: %s, Mnr: %s\n",studiengang,mNr);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
-    scanf("%s",&auswahl);
+    scanf("%s",auswahl);
     if (strcmp(auswahl,"0")==0){
         return;
     }
@@ -146,28 +146,28 @@ void addMark(int socket){
     char mNr[11];
     char studiengang[20];
     char note[10]; //bei Länge 3 ist der string zuerst okay, aber beim aneinanderhängen müll
-    char auswahl[1];
+    char auswahl[2];
 
     printf("Studiengang (max.20): >");
-    scanf("%s",&studiengang);
+    scanf("%s",studiengang);
     if(strcmp(studiengang,"0")==0){
         sendMsg(socket,"0");
         return;
     }
 
     printf("Matrikelnummer (max.9): >");
-    scanf("%s",&mNr);
+    scanf("%s",mNr);
     if(strcmp(mNr,"0")==0){
         sendMsg(socket,"0");
         return;
     }
 
     printf("Note (x.y): >");
-    scanf("%s/0",&note);
+    scanf("%s/0",note);
     while(!validMarkInput(note)){
         printf("Ungülite Eingabe\n");
         printf("Note (x.y): >");
-        scanf("%s/0",&note);
+        scanf("%s/0",note);
     }
     if(strcmp(mNr,"0")==0){
         sendMsg(socket,"0");
@@ -182,11 +182,11 @@ void addMark(int socket){
     printf("Für Student im Studiengang: %s mit Mnr: %s Note %s hinzufügen\n",studiengang,mNr,note);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
-    scanf("%s",&auswahl);
+    scanf("%s",auswahl);
     if (strcmp(auswahl,"0")==0){
         return;
     }
-    printf("Note %s",&note);
+    printf("Note %s",note);
     char message[MAXDATASIZE];
     message[0] = '\0';
     strcat(message,backupG);
@@ -211,14 +211,14 @@ void createStudent(int socket){
     char nachname[21];
     char bday[11];
     char studiengang[21];
-    char auswahl[1];
+    char auswahl[2];
 
     printf("Vorname (max.20): >");
-    scanf("%s",&vorname);
+    scanf("%s",vorname);
     while(!validStudentInput(vorname)){
         printf("Ungültige Eingabe mit ;\n");
         printf("Vorname (max.20): >");
-        scanf("%s",&vorname); 
+        scanf("%s",vorname); 
     }
     if(strcmp(vorname,"0")==0){
         sendMsg(socket,"0");
@@ -226,11 +226,11 @@ void createStudent(int socket){
     }
 
     printf("Nachname (max.20): >");
-    scanf("%s",&nachname);
+    scanf("%s",nachname);
     while(!validStudentInput(nachname)){
         printf("Ungültige Eingabe mit ;\n");
         printf("Nachname (max.20): >");
-        scanf("%s",&nachname); 
+        scanf("%s",nachname); 
     }
     if(strcmp(nachname,"0")==0){
         sendMsg(socket,"0");
@@ -238,11 +238,11 @@ void createStudent(int socket){
     }
 
     printf("Geburtstag (dd.mm.yyyy): >");
-    scanf("%s",&bday); 
+    scanf("%s",bday); 
     while(!validStudentInput(bday)){
         printf("Ungültige Eingabe mit ;\n");
         printf("Geburtstag (dd.mm.yyyy): >");
-        scanf("%s",&bday); 
+        scanf("%s",bday); 
     }
     if(strcmp(bday,"0")==0){
         sendMsg(socket,"0");
@@ -251,11 +251,11 @@ void createStudent(int socket){
 
 
     printf("Studiengang (muss vorhanden sein, max.20): >");
-    scanf("%s",&studiengang);
+    scanf("%s",studiengang);
     while(!validStudentInput(studiengang)){
         printf("Ungültige Eingabe mit ;\n");
         printf("Studiengang (max.20): >");
-        scanf("%s",&studiengang); 
+        scanf("%s",studiengang); 
     }
     if(strcmp(studiengang,"0")==0){
         sendMsg(socket,"0");
@@ -263,11 +263,11 @@ void createStudent(int socket){
     }
 
     printf("Passwort (max.10): >");
-    scanf("%s",&passwort);
+    scanf("%s",passwort);
     while(!validStudentInput(passwort)){
         printf("Ungültige Eingabe mit ;\n");
         printf("Passwort (max.10): >");
-        scanf("%s",&passwort); 
+        scanf("%s",passwort); 
     }
     if(strcmp(passwort,"0")==0){
         sendMsg(socket,"0");
@@ -283,7 +283,7 @@ void createStudent(int socket){
     printf("%s %s, Studiengang: %s, Geb.: %s \n, Passwort: %s",vorname,nachname,studiengang,bday,passwort);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
-    scanf("%s",&auswahl);
+    scanf("%s",auswahl);
     if (strcmp(auswahl,"0")==0){
         return;
     }
@@ -301,9 +301,9 @@ void findGroup(int socket)
     printf("Studiengangsmitglieder finden\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];
+    char title[MAXDATASIZE];//TODO: Länge 21?
     printf("Bitte geben Sie den gesuchten Studiengang an: >");
-    scanf("%s",&title);
+    scanf("%s",title);
     if(strcmp(title,"0")==0)
     {
         sendMsg(socket,"0");
@@ -320,9 +320,9 @@ void createGroup(int socket){
     printf("Studiengang anlegen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];
+    char title[MAXDATASIZE];//Länge 21?
     printf("Bitte Titel eingeben: >");
-    scanf("%s",&title);
+    scanf("%s",title);
     if(strcmp(title,"0")==0){
         sendMsg(socket,"0");
         return;
@@ -338,9 +338,9 @@ void groupsBest(int socket)
     printf("Studiengangsbesten anzeigen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];
+    char title[MAXDATASIZE];//TODO: Länge 21?
     printf("Bitte geben Sie den gesuchten Studiengang an: >");
-    scanf("%s",&title);
+    scanf("%s",title);
     if(strcmp(title,"0")==0)
     {
         sendMsg(socket,"0");
@@ -348,8 +348,8 @@ void groupsBest(int socket)
     }
     sendMsg(socket,title);
     printf("Noch keine Ausgabe\n");
-    /*char* rec;
-    rec = recMsg(socket);*/
+    char* rec;
+    rec = recMsg(socket);
 }
 
 void bestOfAll(int socket)
