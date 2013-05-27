@@ -35,7 +35,7 @@ int checkStudent(char* mNr){
 			char* name = mainfile->d_name;
 			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
 				printf("DIR: %s\n",mainfile->d_name);
-				sfolder = opendir(mainfile->d_name);
+                sfolder = opendir(mainfile->d_name);
 				while((subfile=readdir(sfolder))!=NULL){
 					char* subname = subfile->d_name;
 					if(strcmp(subname,mNr)==0){
@@ -103,7 +103,7 @@ double average(char* student)
 	{
 		countSemikolon++;
 
-		//save current token
+        //save current token
 		input[countSemikolon] = token;	
 		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
 		if(countSemikolon >6)
@@ -145,7 +145,8 @@ void createGroup(int fd)
 int validateLogin(int fd)
 {
 	printf("Login\n");
-    char* login = recMsg(fd);
+    char* login = recMsg(fd); 
+    printf("Login Request: %s\n",login);
 	if(strcmp(login,"0")==0)
 	{	 sendMsg(fd, "-1"); return; }
 
@@ -189,7 +190,6 @@ int validateLogin(int fd)
       						printf("Problem beim Öffnen des Ordners/Datei.\n");
 							perror("chdir");
 							perror("fopen");
-      					    sendMsg(fd, "-1");
                             return -1;
 						}
 						else
@@ -218,6 +218,7 @@ int validateLogin(int fd)
                                 printf("PASSWORD SUCCESS!\n");
                                 if(strcmp(name,"Admin")==0){
                                         printf("ADMIN LOGIN\n");
+                                        chdir("..");
                                         return 1;
                                 }
                                 return 0;
@@ -486,8 +487,10 @@ int findStudent(int fd)
    	}
 	
 	// In Gruppen-Verzeichnis wechseln
+    printf("JOIN : %s\n",input[1]);
    	if(chdir(input[1]) == -1) 
 	{
+        perror("chdir");
 		printf("Studiengang nicht vorhanden\n");
 		sendMsg(fd, "\nStudiengang nicht vorhanden.\n");
    	}
@@ -807,13 +810,14 @@ void handleMenu(int fd){
             addMark(fd);
 	}
         if(strcmp(auswahl,"6")==0){
-            //TODO: einfügen
+            groupsBest(fd);
 	}
         if(strcmp(auswahl,"7")==0){
             bestOfAll(fd);
         }
         if(strcmp(auswahl,"8")==0){
             printf("BEENDEN");
+            return;
         }
         if(strcmp(auswahl,"9")==0){
             printf("Show Student data");
@@ -916,9 +920,6 @@ int main(int argc, char *argv[ ]){
         handleMenu(new_fd);
         close(new_fd);
     }
-
-    handleMenu(new_fd);
-    
 
 	exit(0);
 }

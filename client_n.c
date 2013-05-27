@@ -42,18 +42,12 @@ char* manageLogin(int socket){
     scanf("%s",login);
     printf("\nPasswort: >");
     scanf("%s",password);
-    //sprintf(message,"%s;%s",login,password);
-    //sendMsg(socket,message); 
+    sprintf(message,"%s;%s",login,password);
+    sendMsg(socket,message); 
     //REST OF LOGIN
-    //rec=recMsg(socket);
-    //if(strcmp(rec,"0")==0){
-    //  return login;
-    //}
-    //return rec;
-    static char* ret;
-    ret = "1";
-    printf("Login Done");
-    return ret;
+    rec=recMsg(socket);
+    printf("Rec: %s",rec);
+    return rec;
 }
 
 
@@ -142,6 +136,7 @@ void findStudent(int socket){
     char* rec;
     rec = recMsg(socket);
     //printf("%s\n", rec);
+    return;
 }
 
 void addMark(int socket){
@@ -306,7 +301,7 @@ void findGroup(int socket)
     printf("Studiengangsmitglieder finden\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];
+    char title[MAXDATASIZE];//TODO: Länge 21?
     printf("Bitte geben Sie den gesuchten Studiengang an: >");
     scanf("%s",title);
     if(strcmp(title,"0")==0)
@@ -325,7 +320,7 @@ void createGroup(int socket){
     printf("Studiengang anlegen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];
+    char title[MAXDATASIZE];//Länge 21?
     printf("Bitte Titel eingeben: >");
     scanf("%s",title);
     if(strcmp(title,"0")==0){
@@ -343,7 +338,7 @@ void groupsBest(int socket)
     printf("Studiengangsbesten anzeigen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];
+    char title[MAXDATASIZE];//TODO: Länge 21?
     printf("Bitte geben Sie den gesuchten Studiengang an: >");
     scanf("%s",title);
     if(strcmp(title,"0")==0)
@@ -352,6 +347,7 @@ void groupsBest(int socket)
         return;
     }
     sendMsg(socket,title);
+    printf("Noch keine Ausgabe\n");
     char* rec;
     rec = recMsg(socket);
 }
@@ -414,7 +410,7 @@ char SMenu(int socket, char* mNr){
 		switch(option){
 			case 0: system("clear");showSMenu();break;
 			case 1: system("clear");sendMsg(socket,"7");showSData(socket,mNr);return '1';
-			case 2: sendMsg(socket,"6");exitProgramm();
+			case 2: sendMsg(socket,"8");exitProgramm();
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
 	
@@ -491,11 +487,15 @@ int main(int argc, char *argv[ ]){
             printf("Login fehlerhaft");
             exit(1);
         } else if(strcmp(typ,"1")==0){
-            MainMenu(sock);
-        } else {
-            SMenu(sock,typ);
+            while(1){
+                MainMenu(sock);
+            }
+        } else if (strcmp(typ,"0")==0) {
+            while(1){
+                SMenu(sock,typ);
+            }
         }
-
+        printf("MAIN");
     	//message[0] = option;
 		//printf(">");
 		//scanf("%s",&message);
