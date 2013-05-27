@@ -350,9 +350,8 @@ void groupsBest(int socket)
         return;
     }
     sendMsg(socket,title);
-    printf("Noch keine Ausgabe\n");
-    /*char* rec;
-    rec = recMsg(socket);*/
+    char* rec;
+    rec = recMsg(socket);
 }
 
 void bestOfAll(int socket)

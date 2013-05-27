@@ -132,9 +132,9 @@ void createGroup(int fd)
 int validateLogin(int fd)
 {
 	printf("Login\n");
-    char* login = recMsg(fd);
+    	char* login = recMsg(fd);
 	if(strcmp(login,"0")==0)
-	{	 sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
+	{	 sendMsg(fd, "-1"); return; }
 
 	char seps[]   = ";";
 	char* token;
@@ -173,11 +173,11 @@ int validateLogin(int fd)
    						if((chdir(mainfile->d_name) == -1) || 
 							((pFile = fopen(input[1], "r")) == NULL))      
 						{
-      						printf("Problem beim Öffnen des Ordners/Datei.\n");
+      							printf("Problem beim Öffnen des Ordners/Datei.\n");
 							perror("chdir");
 							perror("fopen");
-      					    sendMsg(fd, "-1");
-                            return -1;
+      					    		sendMsg(fd, "-1");
+                            				return -1;
 						}
 						else
 						{
@@ -237,9 +237,8 @@ int validateLogin(int fd)
 	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
 }
 
-char* groupsBest(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
+char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 {
-	printf("groupsBest\n");
 	static char bestReturn[MAXDATASIZE];
 	/*char* directory;
     	directory = recMsg(fd);*/
@@ -302,7 +301,7 @@ char* groupsBest(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 					{	bestAvg = compAvg; bestsName = name; }
 				}
 				else
-				{ printf("Average ergab -1.\n\n"); }
+				{ 	printf("Average ergab -1.\n\n"); }
 				
 				char parentD[200];
 				if(getcwd(parentD, sizeof(parentD)) == NULL)
@@ -320,24 +319,55 @@ char* groupsBest(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 			}
 		}
 	}
-	if(bestsName == NULL)
-	{ return "0"; }
-	char name_mark[MAXDATASIZE];
-	sprintf(name_mark, "Student mit MNR %s und Notendurchschnitt %g", bestsName, bestAvg);
-	strcat(students, name_mark);
-	printf("%s",students);
-	
-	sprintf(bestReturn, "%s;%g", bestsName,bestAvg);	//TODO: alle returns hierfür checken
 	/* Lesezeiger wieder schließen */
 	if(closedir(dir) == -1)
 	{	printf("Fehler beim Schließen von %s\n", directory); }
-		
-	//sendMsg(fd, students);
+
+	if(bestsName == NULL)
+	{	return "0"; }
+	
+	char name_mark[MAXDATASIZE];	
+	sprintf(bestReturn, "%s;%g", bestsName,bestAvg);
 	return bestReturn;
+}
+
+int groupsBest(int fd)
+{
+	printf("groupsBest\n");
+	char* directory;
+    	directory = recMsg(fd);
+	char* gBest;
+	gBest = gBestHelp(directory);
+
+	if(strcmp(gBest,"0") == 0)
+	{ 	sendMsg(fd, "Keine Studenten vorhanden oder Fehler aufgetreten.\nBitte überprüfen Sie die Eingaben und versuchen es erneut.\n"); }
+	else
+	{
+		char seps[]   = ";";
+		char* token;
+		int countSemikolon = 1;
+		char* input[MAXDATASIZE];
+
+   		token = strtok(gBest, seps);	
+		while (token != NULL)
+		{
+			//save current token
+			input[countSemikolon] = token;	
+			printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+      			// Get next token:
+      			token = strtok( NULL, seps );
+
+			countSemikolon++;
+   		}
+		char name_mark[MAXDATASIZE];
+		sprintf(name_mark, "Bester Student der Gruppe:\n MNR: %s, Notendurchschnitt: %s\n", input[1], input[2]);
+		sendMsg(fd, name_mark);	
+	}
 }
 
 int bestOfAll(int fd)
 {
+	//TODO: Fehlermeldungen?
 	char* bestsName;
 	char* currentGB;
 	double bestAvg = 0.0;
@@ -362,7 +392,7 @@ int bestOfAll(int fd)
 			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
 			{
 				countSemikolon = 1;
-				currentGB = groupsBest(name);
+				currentGB = gBestHelp(name);
 				if((strcmp(currentGB, "0")) !=0)
 				{
    					token = strtok(currentGB, seps);	
@@ -749,7 +779,7 @@ void handleMenu(int fd){
             addMark(fd);
 	}
         if(strcmp(auswahl,"6")==0){
-            //TODO: einfügen
+            groupsBest(fd);
 	}
         if(strcmp(auswahl,"7")==0){
             bestOfAll(fd);
