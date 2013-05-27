@@ -67,11 +67,24 @@ char* recMsg(int fd){
     return rec;
 }
 
-//0 for Student, 1 for Admin
+//0 for fail, 1 for succsess
 int handleLogin(int fd){
-
-
-    return 1;
+    int indicator = validateLogin(fd);
+    printf("Indi: %d\n",indicator);
+    if(indicator==-1){
+        printf("Error in Anmeldung\n");
+        sendMsg(fd,"-1");
+        return 0;
+    } else if (indicator==0){
+        printf("Anmeldung Student erfolgreich\n");
+        sendMsg(fd,"0");
+        return 1;
+    } else {
+        printf("Anmeldung Admin erfolgreich\n");
+        sendMsg(fd,"1");
+        return 1;
+    }
+    return 0;
 }
 
 double average(char* student)
@@ -132,7 +145,7 @@ void createGroup(int fd)
 int validateLogin(int fd)
 {
 	printf("Login\n");
-    	char* login = recMsg(fd);
+    char* login = recMsg(fd);
 	if(strcmp(login,"0")==0)
 	{	 sendMsg(fd, "-1"); return; }
 
@@ -149,8 +162,8 @@ int validateLogin(int fd)
 		//save current token
 		input[countSemikolon] = token;	
 		printf("token: %s\n", token);
-      		// Get next token:
-      		token = strtok( NULL, seps );
+        // Get next token:
+        token = strtok( NULL, seps );
    	}
 
     DIR *folder = opendir("./");
@@ -173,11 +186,11 @@ int validateLogin(int fd)
    						if((chdir(mainfile->d_name) == -1) || 
 							((pFile = fopen(input[1], "r")) == NULL))      
 						{
-      							printf("Problem beim Öffnen des Ordners/Datei.\n");
+      						printf("Problem beim Öffnen des Ordners/Datei.\n");
 							perror("chdir");
 							perror("fopen");
-      					    		sendMsg(fd, "-1");
-                            				return -1;
+      					    sendMsg(fd, "-1");
+                            return -1;
 						}
 						else
 						{
@@ -201,8 +214,14 @@ int validateLogin(int fd)
       								// Get next token:
       								token = strtok( NULL, seps );
    							}
-							if(strcmp(input[2],student[2])==0)
-							{printf("PASSWORD SUCCESS!"); sendMsg(fd,"0");return 0;}
+							if(strcmp(input[2],student[2])==0){
+                                printf("PASSWORD SUCCESS!\n");
+                                if(strcmp(name,"Admin")==0){
+                                        printf("ADMIN LOGIN\n");
+                                        return 1;
+                                }
+                                return 0;
+                            }
 							else
 							{printf("PASSWORD WRONG!");}
 
@@ -239,6 +258,7 @@ int validateLogin(int fd)
 
 char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 {
+	printf("groupsBest\n");
 	static char bestReturn[MAXDATASIZE];
 	/*char* directory;
     	directory = recMsg(fd);*/
@@ -301,7 +321,7 @@ char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 					{	bestAvg = compAvg; bestsName = name; }
 				}
 				else
-				{ 	printf("Average ergab -1.\n\n"); }
+				{ printf("Average ergab -1.\n\n"); }
 				
 				char parentD[200];
 				if(getcwd(parentD, sizeof(parentD)) == NULL)
@@ -319,6 +339,14 @@ char* gBestHelp(char* directory) //int fd) //TODO: was mit int fd, groupsBest?
 			}
 		}
 	}
+	if(bestsName == NULL)
+	{ return "0"; }
+	char name_mark[MAXDATASIZE];
+	sprintf(name_mark, "Student mit MNR %s und Notendurchschnitt %g", bestsName, bestAvg);
+	strcat(students, name_mark);
+	printf("%s",students);
+	
+	sprintf(bestReturn, "%s;%g", bestsName,bestAvg);	//TODO: alle returns hierfür checken
 	/* Lesezeiger wieder schließen */
 	if(closedir(dir) == -1)
 	{	printf("Fehler beim Schließen von %s\n", directory); }
@@ -779,7 +807,7 @@ void handleMenu(int fd){
             addMark(fd);
 	}
         if(strcmp(auswahl,"6")==0){
-            groupsBest(fd);
+            //TODO: einfügen
 	}
         if(strcmp(auswahl,"7")==0){
             bestOfAll(fd);
@@ -857,27 +885,36 @@ int main(int argc, char *argv[ ]){
 	}
 
 	/* config listener-queue */
-	int listener;
-	listener = listen(sock,BACKLOG);
-	if(listener==-1){
-		perror("CANT LISTEN SOCKET");
-		exit(1);
-	} else {
-		printf("SOCKET Listen\n");
-	}
+    while(1){
+        int listener;
+        listener = listen(sock,BACKLOG);
+        if(listener==-1){
+            perror("CANT LISTEN SOCKET");
+            exit(1);
+        } else {
+            printf("SOCKET Listen\n");
+        }
 
-	/* clean all the dead processes */
-	//sa.sa_handler = sigchld_handler;
-	//sigemptyset(&sa.sa_mask);
-	//sa.sa_flags = SA_RESTART;
+        /* clean all the dead processes */
+        //sa.sa_handler = sigchld_handler;
+        //sigemptyset(&sa.sa_mask);
+        //sa.sa_flags = SA_RESTART;
 
-	/* start accept loop */
-    int socklen = sizeof(struct sockaddr_in);
-    if((new_fd=accept(sock, (struct sockaddr *)&their_addr, &socklen))==-1){
-        perror("CANT ACCEPT CONNECTION");
-        exit(1);
-    } else {
-        printf("SOCKET Accept\n");
+        /* start accept loop */
+        int socklen = sizeof(struct sockaddr_in);
+        if((new_fd=accept(sock, (struct sockaddr *)&their_addr, &socklen))==-1){
+            perror("CANT ACCEPT CONNECTION");
+            exit(1);
+        } else {
+            printf("SOCKET Accept\n");
+        }
+        
+        int valid = handleLogin(new_fd);
+        if (valid==0){
+            close(new_fd);
+        }
+        handleMenu(new_fd);
+        close(new_fd);
     }
 
     handleMenu(new_fd);

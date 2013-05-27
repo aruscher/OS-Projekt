@@ -34,6 +34,8 @@ char* manageLogin(int socket){
     char login[11];
     char password[11];
     char message[MAXDATASIZE];
+    char* rec;
+    int check;
     printf("Anmeldung auf Notenserver\n");
     printf("#########################\n");
     printf("Benutzername(Mnr): >");
@@ -87,9 +89,9 @@ void showMainMenu(){
 	printf("2)Student finden\n");
 	printf("3)Studiengang anlegen\n");
 	printf("4)Studiengangsmitglieder anzeigen\n");
-    	printf("5)Note hinzufügen\n");
-    	printf("6)Studiengangsbesten anzeigen\n");
-    	printf("7)Gesamtbesten anzeigen\n");
+    printf("5)Note hinzufügen\n");
+    printf("6)Studiengangsbesten anzeigen\n");
+    printf("7)Gesamtbesten anzeigen\n");
 	printf("8)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");
@@ -480,6 +482,7 @@ int main(int argc, char *argv[ ]){
 	char message[MAXDATASIZE];
     char* typ;
     typ = manageLogin(sock);
+    printf("TYP: %s",&typ);
 	while(run){
        // scanf("%s",&message);
         //sendMsg(sock,message);
