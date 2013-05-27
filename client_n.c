@@ -84,9 +84,9 @@ void showMainMenu(){
 	printf("2)Student finden\n");
 	printf("3)Studiengang anlegen\n");
 	printf("4)Studiengangsmitglieder anzeigen\n");
-    	printf("5)Note hinzufügen\n");
-    	printf("6)Studiengangsbesten anzeigen\n");
-    	printf("7)Gesamtbesten anzeigen\n");
+    printf("5)Note hinzufügen\n");
+    printf("6)Studiengangsbesten anzeigen\n");
+    printf("7)Gesamtbesten anzeigen\n");
 	printf("8)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");
@@ -410,7 +410,7 @@ char SMenu(int socket, char* mNr){
 		switch(option){
 			case 0: system("clear");showSMenu();break;
 			case 1: system("clear");sendMsg(socket,"7");showSData(socket,mNr);return '1';
-			case 2: sendMsg(socket,"6");exitProgramm();
+			case 2: sendMsg(socket,"8");exitProgramm();
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
 	
