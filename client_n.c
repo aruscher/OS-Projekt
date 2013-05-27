@@ -40,8 +40,7 @@ char* manageLogin(int socket){
     printf("#########################\n");
     printf("Benutzername(Mnr): >");
     scanf("%s",&login);
-    printf("Login: %s",login);
-    printf("Passwort: >"); 
+    printf("\nPasswort: >");
     scanf("%s",&password);
     sprintf(message,"%s;%s",login,password);
     sendMsg(socket,message); 
@@ -84,9 +83,9 @@ void showMainMenu(){
 	printf("2)Student finden\n");
 	printf("3)Studiengang anlegen\n");
 	printf("4)Studiengangsmitglieder anzeigen\n");
-    printf("5)Note hinzufügen\n");
-    printf("6)Studiengangsbesten anzeigen\n");
-    printf("7)Gesamtbesten anzeigen\n");
+    	printf("5)Note hinzufügen\n");
+    	printf("6)Studiengangsbesten anzeigen\n");
+    	printf("7)Gesamtbesten anzeigen\n");
 	printf("8)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");

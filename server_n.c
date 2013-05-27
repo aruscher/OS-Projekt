@@ -879,5 +879,8 @@ int main(int argc, char *argv[ ]){
         close(new_fd);
     }
 
+    handleMenu(new_fd);
+    
+
 	exit(0);
 }
