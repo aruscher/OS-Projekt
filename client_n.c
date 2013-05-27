@@ -136,6 +136,7 @@ void findStudent(int socket){
     char* rec;
     rec = recMsg(socket);
     //printf("%s\n", rec);
+    return;
 }
 
 void addMark(int socket){
@@ -486,11 +487,15 @@ int main(int argc, char *argv[ ]){
             printf("Login fehlerhaft");
             exit(1);
         } else if(strcmp(typ,"1")==0){
-            MainMenu(sock);
-        } else {
-            SMenu(sock,typ);
+            while(1){
+                MainMenu(sock);
+            }
+        } else if (strcmp(typ,"0")==0) {
+            while(1){
+                SMenu(sock,typ);
+            }
         }
-
+        printf("MAIN");
     	//message[0] = option;
 		//printf(">");
 		//scanf("%s",&message);

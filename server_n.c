@@ -447,8 +447,10 @@ int findStudent(int fd)
    	}
 	
 	// In Gruppen-Verzeichnis wechseln
+    printf("JOIN : %s\n",input[1]);
    	if(chdir(input[1]) == -1) 
 	{
+        perror("chdir");
 		printf("Studiengang nicht vorhanden\n");
 		sendMsg(fd, "\nStudiengang nicht vorhanden.\n");
    	}
