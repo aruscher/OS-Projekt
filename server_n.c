@@ -130,7 +130,7 @@ double average(char* student)
 
 void createGroup(int fd)
 {
-    	char* title = recMsg(fd);
+    char* title = recMsg(fd);
 	if(strcmp(title,"0")==0)
 	{	 sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
 	if(mkdir(title,S_IRWXU|S_IRGRP|S_IXGRP)!=0){
@@ -679,8 +679,10 @@ int createStudent(int fd)
 	char* student;
 	student = recMsg(fd);
 	printf("StudentRec: %s \n",student);
-	if (strcmp(student,"0")==0)
-	{	sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; } 
+	if (strcmp(student,"0")==0){
+        sendMsg(fd, "\nFehler bei der Datenübertragung.\n");
+        return;
+    } 
 	
 	char mnrCounter[9]= "\0";
 	int mnrCounterInt = 0;
@@ -711,6 +713,7 @@ int createStudent(int fd)
 	else
 	{
 		fgets(mnrCounter,15,mnrFile);
+        mnrCounter[strlen(mnrCounter)-1]='\0';
 		mnrCounterInt = atoi(mnrCounter);
 		mnrCounterInt++;
 		fclose(mnrFile); 
@@ -744,7 +747,6 @@ int createStudent(int fd)
 		{
 			printf("Student angelegt\n");
 			fprintf(newFile, "%s;%s", mnrCounter,writeString);
-
 			fclose(newFile);
 
 			printf("%s\n", mnrCounter);
