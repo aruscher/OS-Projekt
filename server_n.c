@@ -282,7 +282,7 @@ char* gBestHelp(char* directory)
 	while((dirzeiger=readdir(dir)) != NULL)
 	{	
 		char* name = (*dirzeiger).d_name;
-		if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
+		if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0 && strcmp(name,"Admin")!=0)
 		{
 			printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
 			printf("Zeiger:%ld\n",pos); 
@@ -401,7 +401,7 @@ int bestOfAll(int fd)
 		if( attribut.st_mode & S_IFDIR)
 		{
 			char* name = mainfile->d_name;
-			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
+			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0 && strcmp(name,"Admin")!=0)
 			{
 				countSemikolon = 1;
 				currentGB = gBestHelp(name);
@@ -651,7 +651,7 @@ int findGroup(int fd) {
 		while((dirzeiger=readdir(dir)) != NULL)
 		{	
 			char* name = dirzeiger->d_name;
-			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0)
+			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0 && strcmp(name,"Admin")!=0)
 			{
 				found = 1;
 				printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
