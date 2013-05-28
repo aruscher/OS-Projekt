@@ -34,7 +34,7 @@ int checkStudent(char* mNr){
 		if( attribut.st_mode & S_IFDIR){
 			char* name = mainfile->d_name;
 			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
-				printf("DIR: %s\n",mainfile->d_name);
+				printf("DIR: %s\n", mainfile->d_name);
                 sfolder = opendir(mainfile->d_name);
 				while((subfile=readdir(sfolder))!=NULL){
 					char* subname = subfile->d_name;
@@ -807,8 +807,13 @@ char* getPath(char* mNr){
 }
 
 void getSData(int fd){
+	char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+         fprintf(stdout, "Current working dir: %s\n", cwd);
+    else
+           perror("getcwd() error");
     char* mNr = recMsg(fd);
-    printf("Find mNr: %s",mNr);
+    printf("Find mNr: %s\n",mNr);
     char* path = getPath(mNr);
     FILE *pFile = NULL;
     chdir(path);
@@ -842,7 +847,6 @@ void getSData(int fd){
         // Get next token:
         token = strtok( NULL, seps );
     }
-    printf("T2: %s",student[1]); 
     //vname
     sendMsg(fd,student[3]);
     sleep(1);
@@ -896,7 +900,7 @@ void handleMenu(int fd){
         }
         if(strcmp(auswahl,"9")==0){
             getSData(fd);
-            printf("Show Student data");
+
         }
     }
 }

@@ -20,12 +20,10 @@ void sendMsg(int socket,char message[MAXDATASIZE]){
 }
 
 char* recMsg(int socket){
-    printf("Waint for msg\n");
     static char rec[MAXDATASIZE];
     int msg;
     msg = recv(socket,rec,MAXDATASIZE-1,0);
     rec[msg]='\0';
-    printf("recMSG: %s\n",rec);
     return rec;
 }
 
@@ -296,7 +294,7 @@ void createStudent(int socket){
     sendMsg(socket,message);	
     char* rec;
     rec = recMsg(socket);
-    //printf("%s\n", rec);
+
 }
 
 void findGroup(int socket)
@@ -304,7 +302,7 @@ void findGroup(int socket)
     printf("Studiengangsmitglieder finden\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];//TODO: Länge 21?
+    char title[MAXDATASIZE];
     printf("Bitte geben Sie den gesuchten Studiengang an: >");
     scanf("%s",title);
     if(strcmp(title,"0")==0)
@@ -323,7 +321,7 @@ void createGroup(int socket){
     printf("Studiengang anlegen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];//Länge 21?
+    char title[MAXDATASIZE];
     printf("Bitte Titel eingeben: >");
     scanf("%s",title);
     if(strcmp(title,"0")==0){
@@ -341,7 +339,7 @@ void groupsBest(int socket)
     printf("Studiengangsbesten anzeigen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
-    char title[MAXDATASIZE];//TODO: Länge 21?
+    char title[MAXDATASIZE];
     printf("Bitte geben Sie den gesuchten Studiengang an: >");
     scanf("%s",title);
     if(strcmp(title,"0")==0)
@@ -368,9 +366,8 @@ void exitProgramm(){
 }
 char MainMenu(int socket){
 	int option;
-	int i = 1;
 	showMainMenu();
-	while(i==1){
+	while(1){
 		scanf("%i",&option);
 		switch(option){
 			case 0: system("clear");showMainMenu();break;
@@ -398,6 +395,9 @@ void showSMenu(){
 }
 
 void showSData(int socket,char* mNr){
+	char go[10];
+	char mnr[10];
+	strcpy(mnr,mNr);
     printf("Meine Daten\n");
     printf("----------------\n");
     sendMsg(socket,mNr);
@@ -409,16 +409,24 @@ void showSData(int socket,char* mNr){
     printf("Studiengang: %s\n",recMsg(socket));
     printf("---------------\n");
     printf("1 für Weiter\n");
-	//TODO
-	return;
+	printf(">");
+	scanf("%s",&go);
+	while(strcmp(go,"1")!=0){
+		printf("Ungültige Eingabe\n");
+    	printf("1 für Weiter\n");
+		printf(">");
+		scanf("%s",go);
+	}
+	system("clear");
 }
 
 char SMenu(int socket, char* mNr){
+
 	int option;
-    printf("MNR: %s",mNr);
-	int i = 1;
+	char mnr[10];
+	strcpy(mnr,mNr);
 	showSMenu();
-	while(i==1){
+	while(1){
 		scanf("%i",&option);
 		switch(option){
             case 0: system("clear");showSMenu();break;
@@ -428,7 +436,7 @@ char SMenu(int socket, char* mNr){
 		}
 	
 	}
-	return '9';
+	return 'X';
 }
 
 
@@ -472,8 +480,8 @@ int main(int argc, char *argv[ ]){
 	}
 
 
-    	// host byte order
-    	their_addr.sin_family = AF_INET;
+    // host byte order
+    their_addr.sin_family = AF_INET;
 
 	/* short, network byte order */
 	their_addr.sin_port = htons(MYPORT);
@@ -491,10 +499,9 @@ int main(int argc, char *argv[ ]){
 	char message[MAXDATASIZE];
     char* typ;
     typ = manageLogin(sock);
+	char mnr[11];
+	strcpy(mnr,typ);
 	while(run){
-       // scanf("%s",&message);
-        //sendMsg(sock,message);
-        //system("clear");
         if(strcmp(typ,"-1")==0){
             printf("Login fehlerhaft");
             exit(1);
@@ -504,17 +511,9 @@ int main(int argc, char *argv[ ]){
             }
         } else {
             while(1){
-                SMenu(sock,typ);
+				SMenu(sock,mnr);				
             }
         }
-        printf("MAIN");
-    	//message[0] = option;
-		//printf(">");
-		//scanf("%s",&message);
-		//send(sock,message,strlen(message),0);
-		//recieve = recv(sock,buf,MAXDATASIZE-1,0);
-		//buf[recieve]= '\0';
-		//printf("RECIVE: %s \n",buf);
 	}
 	return 0;
 }
