@@ -25,7 +25,7 @@ char* recMsg(int socket){
     int msg;
     msg = recv(socket,rec,MAXDATASIZE-1,0);
     rec[msg]='\0';
-    printf("recMSG:\n %s\n",rec);
+    printf("recMSG: %s\n",rec);
     return rec;
 }
 
@@ -47,6 +47,9 @@ char* manageLogin(int socket){
     //REST OF LOGIN
     rec=recMsg(socket);
     printf("Rec: %s",rec);
+    if(strcmp(rec,"0")==0){
+        strcpy(rec,login);
+    }
     return rec;
 }
 
@@ -367,7 +370,6 @@ char MainMenu(int socket){
 	int option;
 	int i = 1;
 	showMainMenu();
-
 	while(i==1){
 		scanf("%i",&option);
 		switch(option){
@@ -396,7 +398,19 @@ void showSMenu(){
 }
 
 void showSData(int socket,char* mNr){
-    printf("My Student data");
+    printf("Meine Daten\n");
+    printf("----------------\n");
+    sendMsg(socket,mNr);
+    printf("Vorname: %s\n",recMsg(socket));
+    printf("Nachname: %s\n",recMsg(socket));
+    printf("Geburstag: %s\n",recMsg(socket));
+    printf("Matrikelnummer: %s\n",recMsg(socket));
+    printf("Password: %s\n",recMsg(socket));
+    printf("Studiengang: %s\n",recMsg(socket));
+    printf("---------------\n");
+    printf("1 für Weiter\n");
+	//TODO
+	return;
 }
 
 char SMenu(int socket, char* mNr){
@@ -407,8 +421,8 @@ char SMenu(int socket, char* mNr){
 	while(i==1){
 		scanf("%i",&option);
 		switch(option){
-			case 0: system("clear");showSMenu();break;
-			case 1: system("clear");sendMsg(socket,"7");showSData(socket,mNr);return '1';
+            case 0: system("clear");showSMenu();break;
+            case 1: system("clear");sendMsg(socket,"9");showSData(socket,mNr);return '9';
 			case 2: sendMsg(socket,"8");exitProgramm();
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
@@ -477,7 +491,6 @@ int main(int argc, char *argv[ ]){
 	char message[MAXDATASIZE];
     char* typ;
     typ = manageLogin(sock);
-    printf("TYP: %s",&typ);
 	while(run){
        // scanf("%s",&message);
         //sendMsg(sock,message);
@@ -489,7 +502,7 @@ int main(int argc, char *argv[ ]){
             while(1){
                 MainMenu(sock);
             }
-        } else if (strcmp(typ,"0")==0) {
+        } else {
             while(1){
                 SMenu(sock,typ);
             }

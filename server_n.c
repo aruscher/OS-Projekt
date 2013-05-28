@@ -183,52 +183,54 @@ int validateLogin(int fd)
 					char* subname = subfile->d_name;
 					if(strcmp(subname,input[1])==0)
 					{
-						FILE *pFile = NULL;
-   						if((chdir(mainfile->d_name) == -1) || 
-							((pFile = fopen(input[1], "r")) == NULL))      
-						{
-      						printf("Problem beim Öffnen des Ordners/Datei.\n");
-							perror("chdir");
-							perror("fopen");
+                        FILE *pFile = NULL;
+                        if((chdir(mainfile->d_name) == -1) || 
+                                ((pFile = fopen(input[1], "r")) == NULL))      
+                        {
+                            printf("Problem beim Öffnen des Ordners/Datei.\n");
+                            perror("chdir");
+                            perror("fopen");
                             return -1;
-						}
-						else
-						{
-							char *datenStudent;
-							datenStudent=malloc(500);
+                        }
+                        else
+                        {
+                            printf("INPUT1: %s\n",input[1]);
+                            char *datenStudent;
+                            datenStudent=malloc(500);
 
-							while((fscanf(pFile,"%500s",datenStudent)) != EOF)
-							printf("%s\n",datenStudent);
-							fclose(pFile);
+                            while((fscanf(pFile,"%500s",datenStudent)) != EOF)
+                                printf("%s\n",datenStudent);
+                            fclose(pFile);
 
-							countSemikolon = 0;
-							char* student[MAXDATASIZE];
+                            countSemikolon = 0;
+                            char* student[MAXDATASIZE];
 
-   							token = strtok(datenStudent, seps);	
-							while (token != NULL)
-							{
-								countSemikolon++;
+                            token = strtok(datenStudent, seps);	
+                            while (token != NULL)
+                            {
+                                countSemikolon++;
 
-								//save current token
-								student[countSemikolon] = token;	
-      								// Get next token:
-      								token = strtok( NULL, seps );
-   							}
-							if(strcmp(input[2],student[2])==0){
+                                //save current token
+                                student[countSemikolon] = token;	
+                                // Get next token:
+                                token = strtok( NULL, seps );
+                            }
+                            if(strcmp(input[2],student[2])==0){
                                 printf("PASSWORD SUCCESS!\n");
                                 if(strcmp(name,"Admin")==0){
-                                        printf("ADMIN LOGIN\n");
-                                        chdir("..");
-                                        return 1;
+                                    printf("ADMIN LOGIN\n");
+                                    chdir("..");
+                                    return 1;
                                 }
+                                chdir("..");
                                 return 0;
                             }
-							else
-							{printf("PASSWORD WRONG!");}
+                            else
+                            {printf("PASSWORD WRONG!");}
 
-							char parentD[200];
-							if(getcwd(parentD, sizeof(parentD)) == NULL)
-							{
+                            char parentD[200];
+                            if(getcwd(parentD, sizeof(parentD)) == NULL)
+                            {
 								perror("getcwd");
 								printf("Fehler bei getcwd\n");
 							}
@@ -772,6 +774,97 @@ int createStudent(int fd)
 	return 1;
 }
 
+char* getPath(char* mNr){
+    printf("GET PATH\n");
+    DIR *folder = opendir("./");
+	DIR *sfolder;
+	struct stat attribut;
+	struct dirent *mainfile;
+	struct dirent *subfile;
+    static char ret[300] = "PATH NOT FOUND";
+	while((mainfile=readdir(folder))!=NULL){
+		stat(mainfile->d_name,&attribut);
+		if( attribut.st_mode & S_IFDIR){
+			char* name = mainfile->d_name;
+			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
+				printf("DIR: %s\n",mainfile->d_name);
+                sfolder = opendir(mainfile->d_name);
+				while((subfile=readdir(sfolder))!=NULL){
+					char* subname = subfile->d_name;
+					if(strcmp(subname,mNr)==0){
+                        printf("%s/%s\n",mainfile->d_name,subfile->d_name);
+                        sprintf(ret,"%s",mainfile->d_name);
+					}
+				}
+			}
+		}
+	}
+	if(folder==NULL){
+		perror("opendir");
+	}
+    printf("GET PATH DONE\n");
+    return ret;
+}
+
+void getSData(int fd){
+    char* mNr = recMsg(fd);
+    printf("Find mNr: %s",mNr);
+    char* path = getPath(mNr);
+    FILE *pFile = NULL;
+    chdir(path);
+    pFile = fopen(mNr,"r");
+    printf("PATH: %s\n",path);
+    if(pFile==NULL){
+        perror("fopen");
+        return;
+    }
+
+    char *datenStudent;
+    char seps[] = ";";
+    int countSemikolon = 0;
+    char* token;
+    datenStudent=malloc(500);
+
+    while((fscanf(pFile,"%500s",datenStudent)) != EOF)
+        printf("%s\n",datenStudent);
+    fclose(pFile);
+
+    countSemikolon = 0;
+    char* student[MAXDATASIZE];
+
+    token = strtok(datenStudent, seps);	
+    while (token != NULL)
+    {
+        countSemikolon++;
+
+        //save current token
+        student[countSemikolon] = token;	
+        // Get next token:
+        token = strtok( NULL, seps );
+    }
+    printf("T2: %s",student[1]); 
+    //vname
+    sendMsg(fd,student[3]);
+    sleep(1);
+    //nname
+    sendMsg(fd,student[4]);
+    sleep(1);
+    //geb
+    sendMsg(fd,student[6]);
+    sleep(1);
+    //mNR
+    sendMsg(fd,student[1]);
+    sleep(1);
+    //pw
+    sendMsg(fd,student[2]);
+    sleep(1);
+    //studiengang
+    sendMsg(fd,student[5]);
+    sleep(1);
+    //note
+    chdir("..");
+}
+
 void handleMenu(int fd){
     char* auswahl;
     printf("Handle Menu\n");
@@ -799,10 +892,10 @@ void handleMenu(int fd){
             bestOfAll(fd);
         }
         if(strcmp(auswahl,"8")==0){
-            printf("BEENDEN");
             return;
         }
         if(strcmp(auswahl,"9")==0){
+            getSData(fd);
             printf("Show Student data");
         }
     }
