@@ -136,7 +136,7 @@ void findStudent(int socket){
     sendMsg(socket,message);
     char* rec;
     rec = recMsg(socket);
-    //printf("%s\n", rec);
+    printf("%s\n", rec);
     return;
 }
 
@@ -200,7 +200,7 @@ void addMark(int socket){
     sendMsg(socket,message);
     char* rec;
     rec = recMsg(socket);
-    //printf("%s\n", rec);
+    printf("%s\n", rec);
 }
 
 void createStudent(int socket){
@@ -294,6 +294,7 @@ void createStudent(int socket){
     sendMsg(socket,message);	
     char* rec;
     rec = recMsg(socket);
+    printf("%s\n", rec);
 
 }
 
@@ -314,7 +315,7 @@ void findGroup(int socket)
     printf("Folgende Studenten enthalten:\n");
     char* rec;
     while(strcmp(rec = recMsg(socket),"0") != 0)
-	{/*printf("%s\n", rec);*/}
+	{printf("%s\n", rec);}
 }
 
 void createGroup(int socket){
@@ -331,7 +332,7 @@ void createGroup(int socket){
     sendMsg(socket,title);
     char* rec;
     rec = recMsg(socket);
-//    printf("%s\n", rec);
+    printf("%s\n", rec);
 }
 
 void groupsBest(int socket)
@@ -342,14 +343,15 @@ void groupsBest(int socket)
     char title[MAXDATASIZE];
     printf("Bitte geben Sie den gesuchten Studiengang an: >");
     scanf("%s",title);
-    if(strcmp(title,"0")==0)
+    /*if(strcmp(title,"0")==0)
     {
         sendMsg(socket,"0");
         return;
-    }
+    }*/ //Unnötig, da dann ja eh title=="0" und beim sendMsg eh so verschickt?!
     sendMsg(socket,title);
     char* rec;
     rec = recMsg(socket);
+    printf("%s\n", rec);
 }
 
 void bestOfAll(int socket)
@@ -359,6 +361,7 @@ void bestOfAll(int socket)
 
     char* rec;
     rec = recMsg(socket);
+    printf("%s\n", rec);
 }
 
 void exitProgramm(){
