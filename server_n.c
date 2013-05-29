@@ -161,51 +161,48 @@ char* getPath(char* mNr){
     return ret;
 }
 
-void getSData(int fd){
-    char cwd[1024];
-    if (getcwd(cwd, sizeof(cwd)) != NULL)
-         fprintf(stdout, "Current working dir: %s\n", cwd);
-    else
-           perror("getcwd() error");
+void getSData(int fd)
+{
+	char* mNr = recMsg(fd);
+   	printf("Find mNr: %s\n",mNr);
+   	char* path = getPath(mNr);
+   	FILE *pFile = NULL;
+   	chdir(path);
+   	pFile = fopen(mNr,"r");
+   	printf("PATH: %s\n",path);
+   	if(pFile==NULL)
+	{
+		sendMsg(fd, "\nStudent nicht vorhanden.\n");
+		sendMsg(fd, "0");
+   	    perror("fopen");
+   	    return;
+   	}
 
-    char* mNr = recMsg(fd);
-    printf("Find mNr: %s\n",mNr);
-    char* path = getPath(mNr);
-    FILE *pFile = NULL;
-    chdir(path);
-    pFile = fopen(mNr,"r");
-    printf("PATH: %s\n",path);
-    if(pFile==NULL){
-        perror("fopen");
-        return;
-    }
+   	char *datenStudent;
+   	char seps[] = ";";
+   	int countSemikolon = 0;
+   	char* token;
+   	datenStudent=malloc(500);
+	
+   	while((fscanf(pFile,"%500s",datenStudent)) != EOF)
+   	    printf("%s\n",datenStudent);
+   	fclose(pFile);
 
-    char *datenStudent;
-    char seps[] = ";";
-    int countSemikolon = 0;
-    char* token;
-    datenStudent=malloc(500);
+   	char copyStudent[MAXDATASIZE];//TODO: notwendig? average umschreiben, so dass nur noten notwendig?
+   	strcpy(copyStudent, datenStudent);
 
-    while((fscanf(pFile,"%500s",datenStudent)) != EOF)
-        printf("%s\n",datenStudent);
-    fclose(pFile);
-
-    char copyStudent[MAXDATASIZE];//TODO: notwendig? average umschreiben, so dass nur noten notwendig?
-    strcpy(copyStudent, datenStudent);
-
-    countSemikolon = 0;
-    char* student[MAXDATASIZE];
-
-    token = strtok(datenStudent, seps);	
-    while (token != NULL)
-    {
-        countSemikolon++;
-
-        //save current token
-        student[countSemikolon] = token;	
-        // Get next token:
-        token = strtok( NULL, seps );
-    }
+   	countSemikolon = 0;
+   	char* student[MAXDATASIZE];
+	
+   	token = strtok(datenStudent, seps);	
+   	while (token != NULL)
+   	{
+   		countSemikolon++;
+       	//save current token
+		student[countSemikolon] = token;	
+       	// Get next token:
+       	token = strtok( NULL, seps );
+   	}
 
 	char message[MAXDATASIZE];
 	sprintf(message,"\nMNR: %s\nPasswort: %s\nVorname: %s\nName: %s\nStudiengang: %s	\nGeburtstag: %s\n",student[1],student[2],student[3],student[4],student[5],student[6]);
@@ -224,7 +221,6 @@ void getSData(int fd){
 			sprintf(message,"Note: %s\n",student[i]);
 			sendMsg(fd, message);
 		}
-
 		double avg = average(copyStudent);
 		printf("Average: %g\n", avg);
 		if(avg != -1)
@@ -237,7 +233,7 @@ void getSData(int fd){
 		sleep(1);
 		sendMsg(fd, "0");
 	}			
-    chdir("..");
+   	chdir("..");
 }
 
 void createGroup(int fd)
