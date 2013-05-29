@@ -84,9 +84,9 @@ void showMainMenu(){
 	printf("2)Student finden\n");
 	printf("3)Studiengang anlegen\n");
 	printf("4)Studiengang Mitglieder anzeigen\n");
-    printf("5)Note hinzufügen\n");
-    printf("6)Studiengangsbesten anzeigen\n");
-    printf("7)Gesamtbesten anzeigen\n");
+    	printf("5)Note hinzufügen\n");
+    	printf("6)Studiengangsbesten anzeigen\n");
+    	printf("7)Gesamtbesten anzeigen\n");
 	printf("8)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");
@@ -116,13 +116,11 @@ void findStudent(int socket){
         return;
     }
 
-    sendMsg(socket,mnr);
-    printf("Vorname: %s\n",recMsg(socket));
-    printf("Nachname: %s\n",recMsg(socket));
-    printf("Geburstag: %s\n",recMsg(socket));
-    printf("Matrikelnummer: %s\n",recMsg(socket));
-    printf("Passwort: %s\n",recMsg(socket));
-    printf("Studiengang: %s\n",recMsg(socket));
+    sendMsg(socket,mNr);
+
+    char* rec;
+    while(strcmp(rec = recMsg(socket),"0") != 0)
+	{printf("%s", rec);}
     printf("---------------\n");
     return;
 }
@@ -384,19 +382,17 @@ void showSMenu(){
 	printf("Bitte Nummer eingeben:\n >");
 }
 
-void showSData(int socket,char* mNr){
+void getSData(int socket,char* mNr){
 	char go[10];
 	char mnr[10];
 	strcpy(mnr,mNr);
     printf("Meine Daten\n");
     printf("----------------\n");
     sendMsg(socket,mNr);
-    printf("Vorname: %s\n",recMsg(socket));
-    printf("Nachname: %s\n",recMsg(socket));
-    printf("Geburstag: %s\n",recMsg(socket));
-    printf("Matrikelnummer: %s\n",recMsg(socket));
-    printf("Passwort: %s\n",recMsg(socket));
-    printf("Studiengang: %s\n",recMsg(socket));
+
+    char* rec;
+    while(strcmp(rec = recMsg(socket),"0") != 0)
+	{printf("%s", rec);}
     printf("---------------\n");
     printf("1 für Weiter\n");
 	printf(">");
@@ -420,7 +416,7 @@ char SMenu(int socket, char* mNr){
 		scanf("%i",&option);
 		switch(option){
             case 0: system("clear");showSMenu();break;
-            case 1: system("clear");sendMsg(socket,"9");showSData(socket,mNr);return '9';
+            case 1: system("clear");sendMsg(socket,"9");getSData(socket,mNr);return '9';
 			case 2: sendMsg(socket,"8");exitProgramm();
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
