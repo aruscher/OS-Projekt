@@ -495,12 +495,11 @@ int main(int argc, char *argv[ ]){
                 typ = manageLogin(sock);
                 printf("TYP: %s\n",typ);
             }
-            break;
         } else if(strcmp(typ,"1")==0){
             while(1){
                 MainMenu(sock);
             }
-        } else {
+        } else if (strcmp(typ,"1")!=0 && strcmp(typ,"-1")!=0){   
             while(1){
 				SMenu(sock,mnr);				
             }
