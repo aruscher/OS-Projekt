@@ -533,14 +533,48 @@ int addMark(int fd)
 	{	sendMsg(fd, "\nStudent existiert nicht.\n");}
 	return;
 }
+// Sends all groups to the client
+int showGroups(int fd) 
+{
+	printf("Show Groups\n");
+
+	DIR *dir;
+	struct dirent *dirzeiger;
+ 	/* das Verzeichnis öffnen */
+	if((dir=opendir("./")) == NULL) 
+	{	printf("Fehler bei opendir\n"); sendMsg(fd, "0"); }
+	else
+	{
+		off_t pos;
+		char groups[MAXDATASIZE];//TODO: exakte Länge angeben?
+		/* das komplette Verzeichnis auslesen */
+		while((dirzeiger=readdir(dir)) != NULL)
+		{	
+			char* name = dirzeiger->d_name;
+			if(strchr(name,46) == NULL && strcmp(name,".git")!=0 && strcmp(name,"Admin")!=0 && strcmp(name,"MNR")!=0 && strcmp(name,"servern")!=0 && strcmp(name,"clientn")!=0 && strcmp(name,"makefile")!=0)
+			{
+				printf("%s\n",(*dirzeiger).d_name); pos=telldir(dir); 
+				printf("Zeiger:%ld\n",pos); 
+				sprintf(groups, "%s\n",name);
+				sendMsg(fd, groups);
+			}
+		}	
+		if(closedir(dir) == -1)
+		{	printf("Fehler beim Schließen des Ordners"); }
+	}
+
+	sleep(1);
+ 	sendMsg(fd, "0");
+	return;
+}
 
 // Sends all mNr of a group to the client
 int findGroup(int fd) 
 {
 	printf("find Group\n");
 	int found = 0;
-    	char* directory;
-    	directory = recMsg(fd);
+    char* directory;
+    directory = recMsg(fd);
 	if(strcmp(directory,"0") == 0)
 	{	sendMsg(fd, "\nFehler bei der Datenübertragung.\n"); return; }
 
@@ -670,6 +704,82 @@ int createStudent(int fd)
 	return 1;
 }
 
+//Edits a Student
+int editStudent(int fd)
+{
+	printf("Edit Student\n");
+	char* mNr;
+	mNr = recMsg(fd);
+	char mNrCopy[10];
+	strcpy(mNrCopy,mNr);
+	printf("StudentRec: %s \n",mNr);
+	if (strcmp(mNr,"0")==0)
+	{
+        sendMsg(fd, "0");
+        return;
+    } 
+	
+	char* path = getPath(mNr);
+	if(strcmp(path,"-1") != 0)
+	{
+		if(chdir(path) == -1) //in den Studiengangsordner wechseln, falls vorhanden
+		{	sendMsg(fd, "0"); }
+		else //vorhanden -> File bearbeiten
+		{
+			printf("Erfolgreich nach %s gewechselt!\n", path);
+			FILE *editFile = NULL;
+			if((editFile = fopen(mNr, "w")) == NULL)
+			{
+				perror("fopen");
+				sendMsg(fd, "0");
+			}
+			else
+			{
+				sendMsg(fd,"1");
+				char* student;
+				student = recMsg(fd);
+				
+				fprintf(editFile, "%s;", mNrCopy);
+				fclose(editFile);
+				//TODO: anders?
+				char seps[]   = ";";
+				char* token;
+				int countSemikolon = 0;
+				char* input[MAXDATASIZE];
+
+				token = strtok(student, seps);	
+				while (token != NULL)
+				{
+					countSemikolon++;
+					//save current token
+					input[countSemikolon] = token;	
+					printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+					// Get next token:
+					token = strtok( NULL, seps );
+   				}
+				if((editFile = fopen(mNrCopy, "a")) == NULL)
+				{
+					perror("fopen");
+					sendMsg(fd, "0");
+				}
+				else
+				{
+					fprintf(editFile, "%s;%s;%s;%s;%s", input[1],input[2],input[3],path,input[4]);
+					fclose(editFile);
+				}
+				//TODO Ende
+				char message[MAXDATASIZE];
+				sprintf(message, "\nStudent erfolgreich editiert\n");			
+				sendMsg(fd, message);
+			}			
+			chdir("..");
+		}
+	}
+	else
+	{	sendMsg(fd, "0"); }
+	return;
+}
+
 void handleMenu(int fd)
 {
     char* auswahl;
@@ -684,26 +794,32 @@ void handleMenu(int fd)
 		getSData(fd);
         }
         if(strcmp(auswahl,"3")==0){
-            createGroup(fd);
+            editStudent(fd);
         }
         if(strcmp(auswahl,"4")==0){
-            findGroup(fd);
+            createGroup(fd);
         }
         if(strcmp(auswahl,"5")==0){
-            addMark(fd);
-		}
-        if(strcmp(auswahl,"6")==0){
-            groupsBest(fd);
+            findGroup(fd);
+        }
+		if(strcmp(auswahl,"6")==0){
+            showGroups(fd);
 		}
         if(strcmp(auswahl,"7")==0){
+            addMark(fd);
+		}
+        if(strcmp(auswahl,"8")==0){
+            groupsBest(fd);
+		}
+        if(strcmp(auswahl,"9")==0){
             bestOfAll(fd);
         }
-        if(strcmp(auswahl,"8")==0){
+        if(strcmp(auswahl,"10")==0){
             return;
         }
-        if(strcmp(auswahl,"9")==0){
+        if(strcmp(auswahl,"11")==0){
             getSData(fd);
-        }
+        }//TODO: return werte aller funktionen prüfen ob richtige zahl
     }
 }
 

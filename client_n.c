@@ -82,12 +82,14 @@ void showMainMenu(){
 	printf("Menu\n----\n");
 	printf("1)Student anlegen\n");
 	printf("2)Student finden\n");
-	printf("3)Studiengang anlegen\n");
-	printf("4)Studiengang Mitglieder anzeigen\n");
-    	printf("5)Note hinzufügen\n");
-    	printf("6)Studiengangsbesten anzeigen\n");
-    	printf("7)Gesamtbesten anzeigen\n");
-	printf("8)Beenden\n");
+	printf("3)Student editieren\n");
+	printf("4)Studiengang anlegen\n");
+	printf("5)Studiengang Mitglieder anzeigen\n");
+    	printf("6)Studiengänge finden\n");
+    	printf("7)Note hinzufügen\n");
+    	printf("8)Studiengangsbesten anzeigen\n");
+    	printf("9)Gesamtbesten anzeigen\n");
+	printf("10)Beenden\n");
 	printf("---------------\n");
 	printf("Bitte Nummer eingeben:\n >");
 }
@@ -267,6 +269,120 @@ void createStudent(int socket){
 
 }
 
+void editStudent(int socket){
+    printf("Student editieren\n");
+    printf("---------------\n");
+    printf("0 für Beenden\n");
+    char mNr[10];
+    char passwort[11];
+    char vorname[21];
+    char nachname[21];
+    char bday[11];
+    //char studiengang[21];
+    char auswahl[2];
+
+    printf("Matrikelnummer des zu editierenden Studenten (max.9): >");
+    scanf("%s",mNr);
+    while(!validStudentInput(mNr)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Vorname (max.20): >");
+        scanf("%s",vorname); 
+    }
+    if(strcmp(vorname,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+    sendMsg(socket,mNr);
+    char* rec;
+    rec = recMsg(socket);
+    if(strcmp(rec, "0") == 0)
+    {
+	printf("\nStudent nicht vorhanden\n");
+	return;
+    }
+
+    printf("Vorname (max.20): >");
+    scanf("%s",vorname);
+    while(!validStudentInput(vorname)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Vorname (max.20): >");
+        scanf("%s",vorname); 
+    }
+    if(strcmp(vorname,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+
+    printf("Nachname (max.20): >");
+    scanf("%s",nachname);
+    while(!validStudentInput(nachname)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Nachname (max.20): >");
+        scanf("%s",nachname); 
+    }
+    if(strcmp(nachname,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+
+    printf("Geburtstag (dd.mm.yyyy): >");
+    scanf("%s",bday); 
+    while(!validStudentInput(bday)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Geburtstag (dd.mm.yyyy): >");
+        scanf("%s",bday); 
+    }
+    if(strcmp(bday,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+
+
+    /*printf("Studiengang (muss vorhanden sein, max.20): >");
+    scanf("%s",studiengang);
+    while(!validStudentInput(studiengang)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Studiengang (max.20): >");
+        scanf("%s",studiengang); 
+    }
+    if(strcmp(studiengang,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }*/
+
+    printf("Passwort (max.10): >");
+    scanf("%s",passwort);
+    while(!validStudentInput(passwort)){
+        printf("Ungültige Eingabe mit ;\n");
+        printf("Passwort (max.10): >");
+        scanf("%s",passwort); 
+    }
+    if(strcmp(passwort,"0")==0){
+        sendMsg(socket,"0");
+        return;
+    }
+
+    char backup1[11];
+    //char backup2[20];
+    strcpy(backup1,bday);
+    //strcpy(backup2,studiengang);
+    printf("#############################\n");
+    printf("Zusammenfassung:\n");
+    printf("%s %s, Geb.: %s \n, Passwort: %s",vorname,nachname/*,studiengang*/,bday,passwort);
+    printf("Bestätigen(1) Abbruch(0)\n");
+    printf(">");
+    scanf("%s",auswahl);
+    if (strcmp(auswahl,"0")==0){
+        return;
+    }
+
+    char message[MAXDATASIZE];
+    sprintf(message,"%s;%s;%s;%s",passwort,vorname,nachname/*,backup2*/,backup1);
+    sendMsg(socket,message);	
+    rec = recMsg(socket);
+    printf("%s\n", rec);
+}
+
 void findGroup(int socket)
 {
     printf("Studiengangsmitglieder finden\n");
@@ -285,6 +401,19 @@ void findGroup(int socket)
     char* rec;
     while(strcmp(rec = recMsg(socket),"0") != 0)
 	{printf("%s\n", rec);}
+}
+
+void showGroups(int socket)
+{
+    printf("Studiengänge finden\n");
+    printf("---------------\n");
+    printf("0 für Beenden\n");
+
+    sendMsg(socket,"");
+    printf("Folgende Studiengänge enthalten:\n");
+    char* rec;
+    while(strcmp(rec = recMsg(socket),"0") != 0)
+    {	printf("%s\n", rec); }
 }
 
 void createGroup(int socket){
@@ -345,12 +474,14 @@ char MainMenu(int socket){
 			case 0: system("clear");showMainMenu();break;
 			case 1: system("clear");sendMsg(socket,"1");createStudent(socket);return '1';
 			case 2: system("clear");sendMsg(socket,"2");findStudent(socket);return '2';
-			case 3: system("clear");sendMsg(socket,"3");createGroup(socket);return '3';
-			case 4: system("clear");sendMsg(socket,"4");findGroup(socket);return '4';
-			case 5: system("clear");sendMsg(socket,"5");addMark(socket);return '5';
-			case 6: system("clear");sendMsg(socket,"6");groupsBest(socket);return '6';
-			case 7: system("clear");sendMsg(socket,"7");bestOfAll(socket);return '7';
-			case 8: sendMsg(socket,"8");exitProgramm(); break;
+			case 3: system("clear");sendMsg(socket,"3");editStudent(socket);return '3';
+			case 4: system("clear");sendMsg(socket,"4");createGroup(socket);return '4';
+			case 5: system("clear");sendMsg(socket,"5");findGroup(socket);return '5';
+			case 6:	system("clear");sendMsg(socket,"6");showGroups(socket);return '6';
+			case 7: system("clear");sendMsg(socket,"7");addMark(socket);return '7';
+			case 8: system("clear");sendMsg(socket,"8");groupsBest(socket);return '8';
+			case 9: system("clear");sendMsg(socket,"9");bestOfAll(socket);return '9';
+			case 10: sendMsg(socket,"10");exitProgramm(); break;
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
 	
