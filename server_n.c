@@ -21,38 +21,6 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
-
-//0 if not exist, else 1
-int checkStudent(char* mNr){
-    DIR *folder = opendir("./");
-	DIR *sfolder;
-	struct stat attribut;
-	struct dirent *mainfile;
-	struct dirent *subfile;
-	while((mainfile=readdir(folder))!=NULL){
-		stat(mainfile->d_name,&attribut);
-		if( attribut.st_mode & S_IFDIR){
-			char* name = mainfile->d_name;
-			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
-				printf("DIR: %s\n", mainfile->d_name);
-                sfolder = opendir(mainfile->d_name);
-				while((subfile=readdir(sfolder))!=NULL){
-					char* subname = subfile->d_name;
-					if(strcmp(subname,mNr)==0){
-						return 1;
-					}
-					printf("%s/%s\n",mainfile->d_name,subfile->d_name);
-				}
-			}
-		}
-	}
-	if(folder==NULL){
-		perror("opendir");
-	}
-	printf("After traversal\n");
-    return 0;
-}
-
 void sendMsg(int fd,char message[MAXDATASIZE]){
     send(fd,message,strlen(message),0);
 }
@@ -149,16 +117,18 @@ char* getPath(char* mNr){
 					if(strcmp(subname,mNr)==0){
                         printf("%s/%s\n",mainfile->d_name,subfile->d_name);
                         sprintf(ret,"%s",mainfile->d_name);
+						printf("GET PATH DONE\n");
+    					return ret;
 					}
 				}
 			}
 		}
 	}
 	if(folder==NULL){
-		perror("opendir");
+		perror("opendir"); //TODO: müsste diese Abfrage nicht vor readdir(folder) sein?
 	}
-    printf("GET PATH DONE\n");
-    return ret;
+    printf("No such student\n");
+    return "-1";
 }
 
 void getSData(int fd)
@@ -554,7 +524,7 @@ int addMark(int fd)
 {
 	printf("add Mark\n");
 
-    	char* directory;
+    char* directory;
    	directory = recMsg(fd);
 	char* student;
 
@@ -574,45 +544,32 @@ int addMark(int fd)
 
 		countSemikolon++;
    	}
-
-	if(checkStudent(input[2]) == 1)
+	char* path = getPath(input[1]);
+	if(strcmp(path,"-1") != 0)
 	{
-		// In Gruppen-Verzeichnis wechseln
-   		if(chdir(input[1]) == -1) 
+		if(chdir(path) == -1) 
 		{
 			printf("Studiengang nicht vorhanden\n");
 			sendMsg(fd, "\nStudiengang nicht gefunden.\n");
    		}
 		else
-		{
+   		{
 			printf("Erfolgreich nach %s gewechselt!\n", input[1]);
 	
 			FILE *pFile = NULL;     
-			if( (pFile = fopen(input[2], "a")) == NULL)
+			if( (pFile = fopen(input[1], "a")) == NULL)
 			{
 	      			printf("Student kann nicht gefunden werden");
 	      			sendMsg(fd, "\nStudent wurde nicht gefunden.\n");
 			}
 			else
 			{
-				fprintf(pFile, ";%s", input[3]); 
+				fprintf(pFile, ";%s", input[2]); 
 				fclose(pFile);
 				printf("Note hinzugefügt");
 				sendMsg(fd, "\nDie Note wurde hinzugefügt.\n");
 			}
-	
-			char parentD[200];
-			if(getcwd(parentD, sizeof(parentD)) == NULL)
-			{
-				printf("Fehler bei getcwd\n");
-			}
-			else
-			{
-				char *h;
-				h = strrchr(parentD, '/');
-				*h = '\0';
-				chdir(parentD);
-			}
+			chdir("..");
 		}
 	}
 	else

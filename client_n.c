@@ -130,16 +130,8 @@ void addMark(int socket){
     printf("---------------\n");
     printf("0 für Beenden\n");
     char mNr[11];
-    char studiengang[20];
-    char note[10]; //bei Länge 3 ist der string zuerst okay, aber beim aneinanderhängen müll
+    char note[10]; //TODO: bei Länge 3 ist der string zuerst okay, aber beim aneinanderhängen müll
     char auswahl[2];
-
-    printf("Studiengang (max.20): >");
-    scanf("%s",studiengang);
-    if(strcmp(studiengang,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }
 
     printf("Matrikelnummer (max.9): >");
     scanf("%s",mNr);
@@ -160,26 +152,18 @@ void addMark(int socket){
         return;
     }
 
-    char backupG[20];
     char backupN[10];
-    strcpy(backupG,studiengang);
     strcpy(backupN,note);
     printf("#############################\n");
-    printf("Für Student im Studiengang: %s mit Mnr: %s Note %s hinzufügen\n",studiengang,mNr,note);
+    printf("Für Student mit Mnr: %s Note %s hinzufügen?\n",mNr,note);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
     scanf("%s",auswahl);
     if (strcmp(auswahl,"0")==0){
         return;
     }
-    printf("Note %s",note);
     char message[MAXDATASIZE];
-    message[0] = '\0';
-    strcat(message,backupG);
-    strcat(message,";");
-    strcat(message,mNr);
-    strcat(message,";");
-    strcat(message,backupN);
+    sprintf(message,"%s;%s",mNr,backupN);
 
     printf("Message: %s\n",message);
     sendMsg(socket,message);
