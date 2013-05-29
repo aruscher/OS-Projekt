@@ -245,95 +245,59 @@ int validateLogin(int fd)
         token = strtok( NULL, seps );
    	}
 
-    DIR *folder = opendir("./");
-	DIR *sfolder;
-	struct stat attribut;
-	struct dirent *mainfile;
-	struct dirent *subfile;
-	while((mainfile=readdir(folder))!=NULL){
-		stat(mainfile->d_name,&attribut);
-		if( attribut.st_mode & S_IFDIR){
-			char* name = mainfile->d_name;
-			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
-				printf("DIR: %s\n",mainfile->d_name);
-				sfolder = opendir(mainfile->d_name);
-				while((subfile=readdir(sfolder))!=NULL){
-					char* subname = subfile->d_name;
-					if(strcmp(subname,input[1])==0)
-					{
-                        FILE *pFile = NULL;
-                        if((chdir(mainfile->d_name) == -1) || 
-                                ((pFile = fopen(input[1], "r")) == NULL))      
-                        {
-                            printf("Problem beim Öffnen des Ordners/Datei.\n");
-                            perror("chdir");
-                            perror("fopen");
-                            return -1;
-                        }
-                        else
-                        {
-                            printf("INPUT1: %s\n",input[1]);
-                            char *datenStudent;
-                            datenStudent=malloc(500);
+	char* path = getPath(input[1]);
+	if(strcmp(path,"-1") != 0)
+	{
+		FILE *pFile = NULL;
+		if(chdir(path) == -1 || ((pFile = fopen(input[1], "r")) == NULL))
+		{
+			printf("Problem beim Öffnen des Ordners/Datei\n");
+        	perror("chdir");
+			perror("fopen");
+        	return -1;
+   		}
+		else
+        {
+			printf("INPUT1: %s\n",input[1]);
+            char *datenStudent;
+            datenStudent=malloc(500);
 
-                            while((fscanf(pFile,"%500s",datenStudent)) != EOF)
-                                printf("%s\n",datenStudent);
-                            fclose(pFile);
+            while((fscanf(pFile,"%500s",datenStudent)) != EOF)
+				printf("%s\n",datenStudent);
+            fclose(pFile);
 
-                            countSemikolon = 0;
-                            char* student[MAXDATASIZE];
+            countSemikolon = 0;
+            char* student[MAXDATASIZE];
 
-                            token = strtok(datenStudent, seps);	
-                            while (token != NULL)
-                            {
-                                countSemikolon++;
+            token = strtok(datenStudent, seps);	
+            while (token != NULL)
+            {
+            	countSemikolon++;
+                //save current token
+                student[countSemikolon] = token;	
+                // Get next token:
+                token = strtok( NULL, seps );
+            }
+            if(strcmp(input[2],student[2])==0)
+			{
+           		printf("PASSWORD SUCCESS!\n");
+                if(strcmp(input[1],"admin")==0)
+				{
+                	printf("ADMIN LOGIN\n");
+                    chdir("..");
+                    return 1;
+                }
+         		chdir("..");
+                return 0;
+            }
+            else
+            {	printf("PASSWORD WRONG!"); }
 
-                                //save current token
-                                student[countSemikolon] = token;	
-                                // Get next token:
-                                token = strtok( NULL, seps );
-                            }
-                            if(strcmp(input[2],student[2])==0){
-                                printf("PASSWORD SUCCESS!\n");
-                                if(strcmp(name,"Admin")==0){
-                                    printf("ADMIN LOGIN\n");
-                                    chdir("..");
-                                    return 1;
-                                }
-                                chdir("..");
-                                return 0;
-                            }
-                            else
-                            {printf("PASSWORD WRONG!");}
-
-                            char parentD[200];
-                            if(getcwd(parentD, sizeof(parentD)) == NULL)
-                            {
-								perror("getcwd");
-								printf("Fehler bei getcwd\n");
-							}
-							else
-							{
-								char *h;
-								h = strrchr(parentD, '/');
-								*h = '\0';
-								chdir(parentD);
-							}
-						}
-					}
-					printf("%s/%s\n",mainfile->d_name,subfile->d_name);
-				}
-			}
+            chdir("..");
 		}
-	}
-	if(folder==NULL)
-	{	perror("opendir"); }
-	printf("After traversal\n");
-	
+	}	
 	printf("Benutzer existiert nicht.\n");
 	return -1;
-
-	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
 }
 
 char* gBestHelp(char* directory)
