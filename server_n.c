@@ -896,10 +896,13 @@ int main(int argc, char *argv[ ]){
             printf("UNVALID\n");
             while(valid==0){
                 valid = handleLogin(new_fd);
+                printf("VALID: %d\n",valid);
             }
-        } else {
+        } 
+        if (valid==1){
             handleMenu(new_fd);
         }
+        
     }
 
     exit(0);
