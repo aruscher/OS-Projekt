@@ -125,7 +125,7 @@ double average(char* student)
 		
 		return notenDurchschnitt;
 	}
-	return -1;
+	return 10000;
 }
 
 void createGroup(int fd)
