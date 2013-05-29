@@ -69,6 +69,7 @@ char* recMsg(int fd){
 
 //0 for fail, 1 for succsess
 int handleLogin(int fd){
+    printf("HANDLE LOGIN\n------------\n");
     int indicator = validateLogin(fd);
     printf("Indi: %d\n",indicator);
     if(indicator==-1){
@@ -253,7 +254,6 @@ int validateLogin(int fd)
 	printf("After traversal\n");
 	
 	printf("Benutzer existiert nicht.\n");
-    sendMsg(fd,"-1");
 	return -1;
 
 	//TODO: ausgaben durch sendMsg ersetzen, sendMsg an allen Stellen einfügen
@@ -995,11 +995,14 @@ int main(int argc, char *argv[ ]){
         
         int valid = handleLogin(new_fd);
         if (valid==0){
-            close(new_fd);
+            printf("UNVALID\n");
+            while(valid==0){
+                valid = handleLogin(new_fd);
+            }
+        } else {
+            handleMenu(new_fd);
         }
-        handleMenu(new_fd);
-        close(new_fd);
     }
 
-	exit(0);
+    exit(0);
 }
