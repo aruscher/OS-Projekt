@@ -400,7 +400,7 @@ char* gBestHelp(char* directory)
 			if((chdir(directory) == -1) || 
 				((pFile = fopen(name, "r")) == NULL))     
 			{
-      				printf("Problem beim Öffnen des Ordners/Datei.\n");
+      			printf("Problem beim Öffnen des Ordners/Datei.\n");
 				perror("chdir");
 				perror("fopen");
 				return "0";
@@ -766,10 +766,12 @@ int createStudent(int fd)
 	return 1;
 }
 
-void handleMenu(int fd){
+void handleMenu(int fd)
+{
     char* auswahl;
     printf("Handle Menu\n");
-    while(1){
+    while(1)
+	{
         auswahl = recMsg(fd);
         if(strcmp(auswahl,"1")==0){
             createStudent(fd);
@@ -785,10 +787,10 @@ void handleMenu(int fd){
         }
         if(strcmp(auswahl,"5")==0){
             addMark(fd);
-	}
+		}
         if(strcmp(auswahl,"6")==0){
             groupsBest(fd);
-	}
+		}
         if(strcmp(auswahl,"7")==0){
             bestOfAll(fd);
         }
@@ -797,7 +799,6 @@ void handleMenu(int fd){
         }
         if(strcmp(auswahl,"9")==0){
             getSData(fd);
-
         }
     }
 }
