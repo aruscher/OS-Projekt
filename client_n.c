@@ -97,15 +97,7 @@ void findStudent(int socket){
     printf("---------------\n");
     printf("0 für Beenden\n");
     char mNr[11];
-    char studiengang[20];
     char auswahl[2];
-
-    printf("Studiengang (max.20): >");
-    scanf("%s",studiengang);
-    if(strcmp(studiengang,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }
 
     printf("Matrikelnummer (max.9): >");
     scanf("%s",mNr);
@@ -114,11 +106,9 @@ void findStudent(int socket){
         return;
     }
 
-    char backupG[20];
-    strcpy(backupG,studiengang);
     printf("#############################\n");
-    printf("Sie suchen den folgenden Student:\n");
-    printf("Studiengang: %s, Mnr: %s\n",studiengang,mNr);
+    printf("Sie suchen den folgenden Studenten:\n");
+    printf("Mnr: %s\n",mNr);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
     scanf("%s",auswahl);
@@ -126,17 +116,14 @@ void findStudent(int socket){
         return;
     }
 
-    char message[MAXDATASIZE];
-    message[0] = '\0';
-    strcat(message,backupG);
-    strcat(message,";");
-    strcat(message,mNr);
-
-    printf("Message: %s\n",message);
-    sendMsg(socket,message);
-    char* rec;
-    rec = recMsg(socket);
-    printf("%s\n", rec);
+    sendMsg(socket,mnr);
+    printf("Vorname: %s\n",recMsg(socket));
+    printf("Nachname: %s\n",recMsg(socket));
+    printf("Geburstag: %s\n",recMsg(socket));
+    printf("Matrikelnummer: %s\n",recMsg(socket));
+    printf("Passwort: %s\n",recMsg(socket));
+    printf("Studiengang: %s\n",recMsg(socket));
+    printf("---------------\n");
     return;
 }
 
@@ -408,7 +395,7 @@ void showSData(int socket,char* mNr){
     printf("Nachname: %s\n",recMsg(socket));
     printf("Geburstag: %s\n",recMsg(socket));
     printf("Matrikelnummer: %s\n",recMsg(socket));
-    printf("Password: %s\n",recMsg(socket));
+    printf("Passwort: %s\n",recMsg(socket));
     printf("Studiengang: %s\n",recMsg(socket));
     printf("---------------\n");
     printf("1 für Weiter\n");

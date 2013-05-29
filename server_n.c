@@ -88,6 +88,101 @@ int handleLogin(int fd){
     return 0;
 }
 
+char* getPath(char* mNr){
+    printf("GET PATH\n");
+    DIR *folder = opendir("./");
+	DIR *sfolder;
+	struct stat attribut;
+	struct dirent *mainfile;
+	struct dirent *subfile;
+    static char ret[300] = "PATH NOT FOUND";
+	while((mainfile=readdir(folder))!=NULL){
+		stat(mainfile->d_name,&attribut);
+		if( attribut.st_mode & S_IFDIR){
+			char* name = mainfile->d_name;
+			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
+				printf("DIR: %s\n",mainfile->d_name);
+                sfolder = opendir(mainfile->d_name);
+				while((subfile=readdir(sfolder))!=NULL){
+					char* subname = subfile->d_name;
+					if(strcmp(subname,mNr)==0){
+                        printf("%s/%s\n",mainfile->d_name,subfile->d_name);
+                        sprintf(ret,"%s",mainfile->d_name);
+					}
+				}
+			}
+		}
+	}
+	if(folder==NULL){
+		perror("opendir");
+	}
+    printf("GET PATH DONE\n");
+    return ret;
+}
+
+void getSData(int fd){
+	char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+         fprintf(stdout, "Current working dir: %s\n", cwd);
+    else
+           perror("getcwd() error");
+    char* mNr = recMsg(fd);
+    printf("Find mNr: %s\n",mNr);
+    char* path = getPath(mNr);
+    FILE *pFile = NULL;
+    chdir(path);
+    pFile = fopen(mNr,"r");
+    printf("PATH: %s\n",path);
+    if(pFile==NULL){
+        perror("fopen");
+        return;
+    }
+
+    char *datenStudent;
+    char seps[] = ";";
+    int countSemikolon = 0;
+    char* token;
+    datenStudent=malloc(500);
+
+    while((fscanf(pFile,"%500s",datenStudent)) != EOF)
+        printf("%s\n",datenStudent);
+    fclose(pFile);
+
+    countSemikolon = 0;
+    char* student[MAXDATASIZE];
+
+    token = strtok(datenStudent, seps);	
+    while (token != NULL)
+    {
+        countSemikolon++;
+
+        //save current token
+        student[countSemikolon] = token;	
+        // Get next token:
+        token = strtok( NULL, seps );
+    }
+    //vname
+    sendMsg(fd,student[3]);
+    sleep(1);
+    //nname
+    sendMsg(fd,student[4]);
+    sleep(1);
+    //geb
+    sendMsg(fd,student[6]);
+    sleep(1);
+    //mNR
+    sendMsg(fd,student[1]);
+    sleep(1);
+    //pw
+    sendMsg(fd,student[2]);
+    sleep(1);
+    //studiengang
+    sendMsg(fd,student[5]);
+    sleep(1);
+    //note
+    chdir("..");
+}
+
 double average(char* student)
 {
 	char seps[]   = ";";
@@ -445,7 +540,7 @@ int bestOfAll(int fd)
 
 int findStudent(int fd)
 {
-	printf("find Student\n");
+	/*printf("find Student\n");
 	char* directory;
 	directory = recMsg(fd);
 
@@ -554,7 +649,7 @@ int findStudent(int fd)
 			*h = '\0';
 			chdir(parentD);
 		}
-	}
+	}*/ getSData(fd);
 	return 2;
 }
 
@@ -772,101 +867,6 @@ int createStudent(int fd)
 		}
 	}
 	return 1;
-}
-
-char* getPath(char* mNr){
-    printf("GET PATH\n");
-    DIR *folder = opendir("./");
-	DIR *sfolder;
-	struct stat attribut;
-	struct dirent *mainfile;
-	struct dirent *subfile;
-    static char ret[300] = "PATH NOT FOUND";
-	while((mainfile=readdir(folder))!=NULL){
-		stat(mainfile->d_name,&attribut);
-		if( attribut.st_mode & S_IFDIR){
-			char* name = mainfile->d_name;
-			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
-				printf("DIR: %s\n",mainfile->d_name);
-                sfolder = opendir(mainfile->d_name);
-				while((subfile=readdir(sfolder))!=NULL){
-					char* subname = subfile->d_name;
-					if(strcmp(subname,mNr)==0){
-                        printf("%s/%s\n",mainfile->d_name,subfile->d_name);
-                        sprintf(ret,"%s",mainfile->d_name);
-					}
-				}
-			}
-		}
-	}
-	if(folder==NULL){
-		perror("opendir");
-	}
-    printf("GET PATH DONE\n");
-    return ret;
-}
-
-void getSData(int fd){
-	char cwd[1024];
-    if (getcwd(cwd, sizeof(cwd)) != NULL)
-         fprintf(stdout, "Current working dir: %s\n", cwd);
-    else
-           perror("getcwd() error");
-    char* mNr = recMsg(fd);
-    printf("Find mNr: %s\n",mNr);
-    char* path = getPath(mNr);
-    FILE *pFile = NULL;
-    chdir(path);
-    pFile = fopen(mNr,"r");
-    printf("PATH: %s\n",path);
-    if(pFile==NULL){
-        perror("fopen");
-        return;
-    }
-
-    char *datenStudent;
-    char seps[] = ";";
-    int countSemikolon = 0;
-    char* token;
-    datenStudent=malloc(500);
-
-    while((fscanf(pFile,"%500s",datenStudent)) != EOF)
-        printf("%s\n",datenStudent);
-    fclose(pFile);
-
-    countSemikolon = 0;
-    char* student[MAXDATASIZE];
-
-    token = strtok(datenStudent, seps);	
-    while (token != NULL)
-    {
-        countSemikolon++;
-
-        //save current token
-        student[countSemikolon] = token;	
-        // Get next token:
-        token = strtok( NULL, seps );
-    }
-    //vname
-    sendMsg(fd,student[3]);
-    sleep(1);
-    //nname
-    sendMsg(fd,student[4]);
-    sleep(1);
-    //geb
-    sendMsg(fd,student[6]);
-    sleep(1);
-    //mNR
-    sendMsg(fd,student[1]);
-    sleep(1);
-    //pw
-    sendMsg(fd,student[2]);
-    sleep(1);
-    //studiengang
-    sendMsg(fd,student[5]);
-    sleep(1);
-    //note
-    chdir("..");
 }
 
 void handleMenu(int fd){
