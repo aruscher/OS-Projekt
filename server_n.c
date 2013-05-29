@@ -131,6 +131,7 @@ char* getPath(char* mNr){
     return "-1";
 }
 
+//Sends all Student data to the client by taking the mNr
 void getSData(int fd)
 {
 	char* mNr = recMsg(fd);
@@ -158,7 +159,7 @@ void getSData(int fd)
    	    printf("%s\n",datenStudent);
    	fclose(pFile);
 
-   	char copyStudent[MAXDATASIZE];//TODO: notwendig? average umschreiben, so dass nur noten notwendig?
+   	char copyStudent[MAXDATASIZE];
    	strcpy(copyStudent, datenStudent);
 
    	countSemikolon = 0;
@@ -206,6 +207,7 @@ void getSData(int fd)
    	chdir("..");
 }
 
+//creates a new group directory
 void createGroup(int fd)
 {
     char* title = recMsg(fd);
@@ -220,6 +222,7 @@ void createGroup(int fd)
 	return;
 }
 
+//Checks the Login name and password
 int validateLogin(int fd)
 {
 	printf("Login\n");
@@ -300,6 +303,7 @@ int validateLogin(int fd)
 	return -1;
 }
 
+//Returns the groupsbest and average
 char* gBestHelp(char* directory)
 {
 	static char bestReturn[MAXDATASIZE];
@@ -357,21 +361,8 @@ char* gBestHelp(char* directory)
 					compAvg = avg;
 					if(bestAvg > compAvg)
 					{	bestAvg = compAvg; bestsName = name; }
-				}
-				
-				char parentD[200];//TODO: einfachere Version verwenden ".."
-				if(getcwd(parentD, sizeof(parentD)) == NULL)
-				{
-					perror("getcwd");
-					printf("Fehler bei getcwd\n");
-				}
-				else
-				{
-					char *h;
-					h = strrchr(parentD, '/');
-					*h = '\0';
-					chdir(parentD);
-				}
+				}				
+				chdir("..");
 			}
 		}
 	}
@@ -386,6 +377,7 @@ char* gBestHelp(char* directory)
 	return bestReturn;
 }
 
+//Sends the groups best and average to the client by using gBestHelp
 int groupsBest(int fd)
 {
 	printf("groupsBest\n");
@@ -420,9 +412,9 @@ int groupsBest(int fd)
 	}
 }
 
+//Sends the best student's mNr and average to the client
 int bestOfAll(int fd)
 {
-	//TODO: Fehlermeldungen?
 	char bestsName[10];
 	char* currentGB;
 	double bestAvg = 0.0;
@@ -484,6 +476,7 @@ int bestOfAll(int fd)
 	sendMsg(fd,name_mark);
 }
 
+//Adds a mark to students data by taking the mNr
 int addMark(int fd)
 {
 	printf("add Mark\n");
@@ -541,8 +534,9 @@ int addMark(int fd)
 	return;
 }
 
-int findGroup(int fd) {
-
+// Sends all mNr of a group to the client
+int findGroup(int fd) 
+{
 	printf("find Group\n");
 	int found = 0;
     	char* directory;
@@ -588,6 +582,7 @@ int findGroup(int fd) {
 	return;
 }
 
+//creates a new Student in a given group directory
 int createStudent(int fd)
 {
 	printf("create Student\n");
@@ -669,20 +664,8 @@ int createStudent(int fd)
 			sprintf(message, "\nStudent wurde erfolgreich erstellt\nMNR: %s\n",mnrCounter);
 			
 			sendMsg(fd, message);
-		}
-			
-		char parentD[200];
-		if(getcwd(parentD, sizeof(parentD)) == NULL)
-		{
-			printf("Fehler bei getcwd\n");
-		}
-		else
-		{
-			char *h;
-			h = strrchr(parentD, '/');
-			*h = '\0';
-			chdir(parentD);
-		}
+		}			
+		chdir("..");
 	}
 	return 1;
 }
