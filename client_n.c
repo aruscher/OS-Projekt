@@ -501,7 +501,7 @@ int main(int argc, char *argv[ ]){
             }
         } else if (strcmp(typ,"1")!=0 && strcmp(typ,"-1")!=0){   
             while(1){
-				SMenu(sock,mnr);				
+				SMenu(sock,typ);				
             }
         }
 	}
