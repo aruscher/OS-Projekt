@@ -145,8 +145,8 @@ void getSData(int fd)
 	{
 		sendMsg(fd, "\nStudent nicht vorhanden.\n");
 		sendMsg(fd, "0");
-   	    perror("fopen");
-   	    return;
+   		perror("fopen");
+   		return;
    	}
 
    	char *datenStudent;
@@ -162,17 +162,16 @@ void getSData(int fd)
    	char copyStudent[MAXDATASIZE];
    	strcpy(copyStudent, datenStudent);
 
-   	countSemikolon = 0;
    	char* student[MAXDATASIZE];
 	
    	token = strtok(datenStudent, seps);	
    	while (token != NULL)
    	{
    		countSemikolon++;
-       	//save current token
+       		//save current token
 		student[countSemikolon] = token;	
-       	// Get next token:
-       	token = strtok( NULL, seps );
+       		// Get next token:
+       		token = strtok( NULL, seps );
    	}
 
 	char message[MAXDATASIZE];
@@ -709,71 +708,95 @@ int editStudent(int fd)
 {
 	printf("Edit Student\n");
 	char* mNr;
+	int i;
 	mNr = recMsg(fd);
+	char message[MAXDATASIZE];
 	char mNrCopy[10];
 	strcpy(mNrCopy,mNr);
 	printf("StudentRec: %s \n",mNr);
 	if (strcmp(mNr,"0")==0)
 	{
-        sendMsg(fd, "0");
-        return;
-    } 
+        	sendMsg(fd, "0");
+        	return;
+	} 
 	
 	char* path = getPath(mNr);
 	if(strcmp(path,"-1") != 0)
 	{
 		if(chdir(path) == -1) //in den Studiengangsordner wechseln, falls vorhanden
-		{	sendMsg(fd, "0"); }
-		else //vorhanden -> File bearbeiten
+		{	sendMsg(fd, "0"); return; }
+		
+		//vorhanden -> File bearbeiten
+		printf("Erfolgreich nach %s gewechselt!\n", path);
+		char *datenStudent;
+   		datenStudent=malloc(500);
+	
+		FILE *editFile = NULL;
+		if((editFile = fopen(mNr, "r")) == NULL)
+		{	perror("fopen"); sendMsg(fd, "0"); return; }
+
+   		while((fscanf(editFile,"%500s",datenStudent)) != EOF)
+   	    		printf("%s\n",datenStudent);
+   		fclose(editFile);
+		
+		sendMsg(fd,"1"); // Student vorhanden -> Client			
+		char seps[]   = ";";
+		char* token;
+		int countSemikolon = 0;
+		char* input[MAXDATASIZE];
+
+		token = strtok(datenStudent, seps);	
+		while (token != NULL)
 		{
-			printf("Erfolgreich nach %s gewechselt!\n", path);
-			FILE *editFile = NULL;
-			if((editFile = fopen(mNr, "w")) == NULL)
+			countSemikolon++;
+			//save current token
+			input[countSemikolon] = token;	
+			printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+			// Get next token:
+			token = strtok( NULL, seps );
+   		}
+		char* choice;
+		choice = recMsg(fd);
+		if(strcmp(choice,"1") == 0) //Passwort ändern
+		{
+			choice = recMsg(fd);
+			input[2] = choice;
+		}
+		else
+		{
+			if(countSemikolon < 7)
 			{
-				perror("fopen");
-				sendMsg(fd, "0");
+				sleep(1);
+				sendMsg(fd, "Keine Noten vorhanden");
 			}
 			else
 			{
-				sendMsg(fd,"1");
-				char* student;
-				student = recMsg(fd);
-				
-				fprintf(editFile, "%s;", mNrCopy);
-				fclose(editFile);
-				//TODO: anders?
-				char seps[]   = ";";
-				char* token;
-				int countSemikolon = 0;
-				char* input[MAXDATASIZE];
+				for(i = 7; i <= countSemikolon; i++)
+				{
+					sprintf(message,"Note %i: %s\n",countSemikolon-6,input[i]);
+					sendMsg(fd, message);
+				}
+				sleep(1);
+				sendMsg(fd, "0");
+				choice = recMsg(fd);
+				char* mark = recMsg(fd);
+				input[atoi(choice)] = mark;
+			}
+		}	
+		if((editFile = fopen(mNrCopy, "w")) == NULL)
+		{	perror("fopen"); sendMsg(fd, "0"); return; }
+		fprintf(editFile, "%s", input[1]);
+		fclose(editFile);
+		if((editFile = fopen(mNrCopy, "a")) == NULL)
+		{	perror("fopen"); sendMsg(fd, "0"); return; }
 
-				token = strtok(student, seps);	
-				while (token != NULL)
-				{
-					countSemikolon++;
-					//save current token
-					input[countSemikolon] = token;	
-					printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
-					// Get next token:
-					token = strtok( NULL, seps );
-   				}
-				if((editFile = fopen(mNrCopy, "a")) == NULL)
-				{
-					perror("fopen");
-					sendMsg(fd, "0");
-				}
-				else
-				{
-					fprintf(editFile, "%s;%s;%s;%s;%s", input[1],input[2],input[3],path,input[4]);
-					fclose(editFile);
-				}
-				//TODO Ende
-				char message[MAXDATASIZE];
-				sprintf(message, "\nStudent erfolgreich editiert\n");			
-				sendMsg(fd, message);
-			}			
-			chdir("..");
-		}
+		for(i = 2; i <= countSemikolon; i++)
+			fprintf(editFile, ";%s", input[i]);
+		fclose(editFile);
+			
+		sprintf(message, "\nStudent erfolgreich editiert\n");			
+		sendMsg(fd, message);		
+		chdir("..");
 	}
 	else
 	{	sendMsg(fd, "0"); }

@@ -274,23 +274,14 @@ void editStudent(int socket){
     printf("---------------\n");
     printf("0 für Beenden\n");
     char mNr[10];
-    char passwort[11];
-    char vorname[21];
-    char nachname[21];
-    char bday[11];
-    //char studiengang[21];
     char auswahl[2];
 
     printf("Matrikelnummer des zu editierenden Studenten (max.9): >");
     scanf("%s",mNr);
     while(!validStudentInput(mNr)){
         printf("Ungültige Eingabe mit ;\n");
-        printf("Vorname (max.20): >");
-        scanf("%s",vorname); 
-    }
-    if(strcmp(vorname,"0")==0){
-        sendMsg(socket,"0");
-        return;
+        printf("Matrikelnummer (max.9): >");
+        scanf("%s",mNr); 
     }
     sendMsg(socket,mNr);
     char* rec;
@@ -301,74 +292,43 @@ void editStudent(int socket){
 	return;
     }
 
-    printf("Vorname (max.20): >");
-    scanf("%s",vorname);
-    while(!validStudentInput(vorname)){
-        printf("Ungültige Eingabe mit ;\n");
-        printf("Vorname (max.20): >");
-        scanf("%s",vorname); 
+    printf("Passwort ändern(1) Note ändern (2) Abbruch(0)\n");
+    printf(">");
+    scanf("%s",auswahl);
+    while(strcmp(auswahl,"0") != 0 && strcmp(auswahl,"1") != 0 && strcmp(auswahl,"2") != 0)
+    {
+        printf("Ungültige Eingabe\n");
+     	printf("Passwort ändern(1) Note ändern (2) Abbruch(0)\n");
+    	printf(">");
+        scanf("%s",auswahl); 
     }
-    if(strcmp(vorname,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }
-
-    printf("Nachname (max.20): >");
-    scanf("%s",nachname);
-    while(!validStudentInput(nachname)){
-        printf("Ungültige Eingabe mit ;\n");
-        printf("Nachname (max.20): >");
-        scanf("%s",nachname); 
-    }
-    if(strcmp(nachname,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }
-
-    printf("Geburtstag (dd.mm.yyyy): >");
-    scanf("%s",bday); 
-    while(!validStudentInput(bday)){
-        printf("Ungültige Eingabe mit ;\n");
-        printf("Geburtstag (dd.mm.yyyy): >");
-        scanf("%s",bday); 
-    }
-    if(strcmp(bday,"0")==0){
-        sendMsg(socket,"0");
-        return;
+    if (strcmp(auswahl,"0")==0)
+    {	return; }
+    sendMsg(socket,auswahl);
+    if(strcmp(auswahl,"1") == 0)
+    {
+    	char passwort[11];
+    	printf("Passwort (max.10): >");
+    	scanf("%s",passwort);
+    	while(!validStudentInput(passwort)){
+        	printf("Ungültige Eingabe mit ;\n");
+        	printf("Passwort (max.10): >");
+        	scanf("%s",passwort); 
+    	}
+    	if(strcmp(passwort,"0")==0){
+        	sendMsg(socket,"0");
+        	return;
+    	}
+	sendMsg(socket,passwort); //neues Passwort senden
+    	rec = recMsg(socket);
+	if(strcmp(rec, "0") == 0)
+	{	printf("Fehler beim Editieren. Bitte versuchen Sie es erneut.\n"); return; }
+	printf("%s\n",rec);
     }
 
-
-    /*printf("Studiengang (muss vorhanden sein, max.20): >");
-    scanf("%s",studiengang);
-    while(!validStudentInput(studiengang)){
-        printf("Ungültige Eingabe mit ;\n");
-        printf("Studiengang (max.20): >");
-        scanf("%s",studiengang); 
-    }
-    if(strcmp(studiengang,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }*/
-
-    printf("Passwort (max.10): >");
-    scanf("%s",passwort);
-    while(!validStudentInput(passwort)){
-        printf("Ungültige Eingabe mit ;\n");
-        printf("Passwort (max.10): >");
-        scanf("%s",passwort); 
-    }
-    if(strcmp(passwort,"0")==0){
-        sendMsg(socket,"0");
-        return;
-    }
-
-    char backup1[11];
-    //char backup2[20];
-    strcpy(backup1,bday);
-    //strcpy(backup2,studiengang);
-    printf("#############################\n");
+    /*printf("#############################\n");
     printf("Zusammenfassung:\n");
-    printf("%s %s, Geb.: %s \n, Passwort: %s",vorname,nachname/*,studiengang*/,bday,passwort);
+    printf("%s %s, Geb.: %s \n, Passwort: %s",vorname,nachname,bday,passwort);
     printf("Bestätigen(1) Abbruch(0)\n");
     printf(">");
     scanf("%s",auswahl);
@@ -377,10 +337,10 @@ void editStudent(int socket){
     }
 
     char message[MAXDATASIZE];
-    sprintf(message,"%s;%s;%s;%s",passwort,vorname,nachname/*,backup2*/,backup1);
+    sprintf(message,"%s;%s;%s;%s",passwort,vorname,nachname,backup1);
     sendMsg(socket,message);	
     rec = recMsg(socket);
-    printf("%s\n", rec);
+    printf("%s\n", rec);*/
 }
 
 void findGroup(int socket)
