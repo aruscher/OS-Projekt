@@ -762,25 +762,25 @@ int editStudent(int fd)
 			choice = recMsg(fd);
 			input[2] = choice;
 		}
-		else
+		else //Note ändern
 		{
 			if(countSemikolon < 7)
 			{
-				sleep(1);
-				sendMsg(fd, "Keine Noten vorhanden");
+				sendMsg(fd, "0");
 			}
 			else
 			{
 				for(i = 7; i <= countSemikolon; i++)
 				{
-					sprintf(message,"Note %i: %s\n",countSemikolon-6,input[i]);
+					sprintf(message,"Note %i: %s\n",i-6,input[i]);
 					sendMsg(fd, message);
 				}
 				sleep(1);
 				sendMsg(fd, "0");
 				choice = recMsg(fd);
+				int count = atoi(choice)+6;
 				char* mark = recMsg(fd);
-				input[atoi(choice)] = mark;
+				input[count] = mark;
 			}
 		}	
 		if((editFile = fopen(mNrCopy, "w")) == NULL)

@@ -319,28 +319,77 @@ void editStudent(int socket){
         	sendMsg(socket,"0");
         	return;
     	}
+    	printf("#############################\n");
+    	printf("Für Student mit Mnr: %s Passwort zu %s ändern?\n",mNr,passwort);
+    	printf("Bestätigen(1) Abbruch(0)\n");
+    	printf(">");
+    	scanf("%s",auswahl);
+    	if (strcmp(auswahl,"0")==0){
+    	    return;
+    	}
 	sendMsg(socket,passwort); //neues Passwort senden
     	rec = recMsg(socket);
 	if(strcmp(rec, "0") == 0)
 	{	printf("Fehler beim Editieren. Bitte versuchen Sie es erneut.\n"); return; }
 	printf("%s\n",rec);
+	return;
     }
-
-    /*printf("#############################\n");
-    printf("Zusammenfassung:\n");
-    printf("%s %s, Geb.: %s \n, Passwort: %s",vorname,nachname,bday,passwort);
-    printf("Bestätigen(1) Abbruch(0)\n");
-    printf(">");
-    scanf("%s",auswahl);
-    if (strcmp(auswahl,"0")==0){
-        return;
+    else // Note ändern
+    {
+	rec = recMsg(socket);
+	if(strcmp(rec,"0") == 0)
+	{	printf("Keine Noten vorhanden\n"); return; }
+	printf("%s", rec); //Noten vorhanden
+	int counter = 1; //Anzahl der Noten
+    	while(strcmp(rec = recMsg(socket),"0") != 0)
+	{	printf("%s", rec); counter++;}
+    	printf("---------------\n");
+    	printf("Die wievielte Note wollen Sie ändern?\n");
+    	printf(">");
+    	scanf("%s",auswahl);
+	//TODO: Überprüfung ob im Rahmen
+	/*int auswahlInt = atoi(auswahl);
+	printf("%i\n",auswahlInt);
+    	while(auswahlInt == NULL || auswahlInt < 0 || auswahlInt > counter)
+	{
+    		if (strcmp(auswahl,"0")==0)
+		{	return; }
+		printf("Ungültige Eingabe\n");
+    		printf("Die wievielte Note wollen Sie ändern?\n");
+    		printf(">");
+    		scanf("%s",auswahl);
+    	}*/
+	sendMsg(socket,auswahl);
+    	char mark[4];
+    	printf("Neue Note (x.y): >");
+    	scanf("%s/0",mark);
+    	while(!validMarkInput(mark))
+	{
+    	    printf("Ungülite Eingabe\n");
+    	    printf("Note (x.y): >");
+    	    scanf("%s/0",mark);
+    	}
+    	if(strcmp(mNr,"0")==0)
+	{
+    	    sendMsg(socket,"0");
+    	    return;
+    	}
+	printf("#############################\n");
+    	printf("Für Student mit Mnr: %s Note %s zu %s ändern?\n",mNr,auswahl,mark);
+    	printf("Bestätigen(1) Abbruch(0)\n");
+    	printf(">");
+    	scanf("%s",auswahl);
+    	if (strcmp(auswahl,"0")==0){
+    	    return;
+    	}
+	sendMsg(socket,mark); //neue Note senden
+    	rec = recMsg(socket);
+	if(strcmp(rec, "0") == 0)
+	{	printf("Fehler beim Editieren. Bitte versuchen Sie es erneut.\n"); return; }
+	printf("%s\n",rec);
+	return;
     }
-
-    char message[MAXDATASIZE];
-    sprintf(message,"%s;%s;%s;%s",passwort,vorname,nachname,backup1);
-    sendMsg(socket,message);	
-    rec = recMsg(socket);
-    printf("%s\n", rec);*/
+    return;
 }
 
 void findGroup(int socket)
