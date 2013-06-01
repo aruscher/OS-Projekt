@@ -627,7 +627,7 @@ int createStudent(int fd)
         return;
     } 
 	
-	char mnrCounter[9]= "\0";
+	char mnrCounter[10]= "\0";
 	int mnrCounterInt = 0;
 
 	char writeString[MAXDATASIZE];
@@ -655,8 +655,7 @@ int createStudent(int fd)
 		printf("Fehler1 beim MatrikelCounter");
 	else
 	{
-		fgets(mnrCounter,15,mnrFile);
-        mnrCounter[strlen(mnrCounter)-1]='\0';
+		fscanf(mnrFile,"%10s",mnrCounter);
 		mnrCounterInt = atoi(mnrCounter);
 		mnrCounterInt++;
 		fclose(mnrFile); 
@@ -677,7 +676,7 @@ int createStudent(int fd)
 		printf("Studiengang %s nicht vorhanden\n", input[4]); 
 		sendMsg(fd, "\nDer Studiengang ist nicht vorhanden.\n");
 	}
-	else //vorhanden -> neuen File erstellen
+	else //Studiengang vorhanden -> neuen File erstellen
 	{
 		printf("Erfolgreich nach %s gewechselt!\n", input[4]);
 		FILE *newFile = NULL;
@@ -726,7 +725,7 @@ int editStudent(int fd)
 		if(chdir(path) == -1) //in den Studiengangsordner wechseln, falls vorhanden
 		{	sendMsg(fd, "0"); return; }
 		
-		//vorhanden -> File bearbeiten
+		//Studiengang vorhanden -> File bearbeiten
 		printf("Erfolgreich nach %s gewechselt!\n", path);
 		char *datenStudent;
    		datenStudent=malloc(500);
@@ -780,6 +779,8 @@ int editStudent(int fd)
 				choice = recMsg(fd);
 				int count = atoi(choice)+6;
 				char* mark = recMsg(fd);
+				if(count < 7 || count > countSemikolon)
+				{	sendMsg(fd, "0"); return; }
 				input[count] = mark;
 			}
 		}	
