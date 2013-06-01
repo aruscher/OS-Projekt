@@ -38,9 +38,9 @@ char* manageLogin(int socket){
     printf("Anmeldung auf Notenserver\n");
     printf("#########################\n");
     printf("Benutzername(Mnr): >");
-    scanf("%s",&login);
+    scanf("%s",login);
     printf("\nPasswort: >");
-    scanf("%s",&password);
+    scanf("%s",password);
     sprintf(message,"%s;%s",login,password);
     sendMsg(socket,message); 
     rec=recMsg(socket);
@@ -347,18 +347,6 @@ void editStudent(int socket){
     	printf("Die wievielte Note wollen Sie ändern?\n");
     	printf(">");
     	scanf("%s",auswahl);
-	//TODO: Überprüfung ob im Rahmen
-	/*int auswahlInt = atoi(auswahl);
-	printf("%i\n",auswahlInt);
-    	while(auswahlInt == NULL || auswahlInt < 0 || auswahlInt > counter)
-	{
-    		if (strcmp(auswahl,"0")==0)
-		{	return; }
-		printf("Ungültige Eingabe\n");
-    		printf("Die wievielte Note wollen Sie ändern?\n");
-    		printf(">");
-    		scanf("%s",auswahl);
-    	}*/
 	sendMsg(socket,auswahl);
     	char mark[4];
     	printf("Neue Note (x.y): >");
@@ -495,7 +483,7 @@ char MainMenu(int socket){
 		}
 	
 	}
-	return '9';
+	return '9'; //TODO: welche zahl?
 }
 
 void showSMenu(){
@@ -520,7 +508,7 @@ void getSData(int socket,char* mNr){
     printf("---------------\n");
     printf("1 für Weiter\n");
 	printf(">");
-	scanf("%s",&go);
+	scanf("%s",go);
 	while(strcmp(go,"1")!=0){
 		printf("Ungültige Eingabe\n");
     	printf("1 für Weiter\n");
@@ -540,8 +528,8 @@ char SMenu(int socket, char* mNr){
 		scanf("%i",&option);
 		switch(option){
             case 0: system("clear");showSMenu();break;
-            case 1: system("clear");sendMsg(socket,"9");getSData(socket,mNr);return '9';
-			case 2: sendMsg(socket,"8");exitProgramm();
+            case 1: system("clear");sendMsg(socket,"11");getSData(socket,mNr);return; //TODO: Zahl return?
+			case 2: sendMsg(socket,"10");exitProgramm();
 			default: printf("Ungültige Nummer. 0 für Hauptmenu\n >"); break;
 		}
 	
