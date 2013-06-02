@@ -634,7 +634,6 @@ int main(int argc, char *argv[ ]){
     typ = manageLogin(sock);
 	char mnr[11];
 	strcpy(mnr,typ);
-    printf("TYP: %s\n",mnr);
 	while(run){
         if(strcmp(typ,"-1")==0){
             printf("Login fehlerhaft\n");
@@ -648,7 +647,7 @@ int main(int argc, char *argv[ ]){
             }
         } else if (strcmp(typ,"1")!=0 && strcmp(typ,"-1")!=0){   
             while(1){
-				SMenu(sock,typ);				
+				SMenu(sock,mnr);				
             }
         }
 	}
