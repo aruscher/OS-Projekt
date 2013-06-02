@@ -21,17 +21,19 @@
 // max number of bytes we can get at once
 #define MAXDATASIZE 300
 
+//wrapper for sending a message 
 void sendMsg(int fd,char message[MAXDATASIZE]){
     send(fd,message,strlen(message),0);
 }
 
+//wrapper for recieveing messages
 char* recMsg(int fd){
-    printf("Waint for msg\n");
+//   printf("Waint for msg\n");
     static char rec[MAXDATASIZE];
     int msg;
     msg = recv(fd,rec,MAXDATASIZE-1,0);
     rec[msg]='\0';
-    printf("recMSG: %s\n",rec);
+//    printf("recMSG: %s\n",rec);
     return rec;
 }
 
@@ -56,6 +58,8 @@ int handleLogin(int fd){
     return 0;
 }
 
+//calculate the average mark for an given csv student string
+//-1 if an error occures
 double average(char* student)
 {
 	char seps[]   = ";";
@@ -74,7 +78,7 @@ double average(char* student)
 
         //save current token
 		input[countSemikolon] = token;	
-		printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
+		//printf("token: %s, attribute: %s\n", token, input[countSemikolon]);
 		if(countSemikolon >6)
 		{
 			notenwert = atof(token); //String into Double
@@ -97,18 +101,22 @@ double average(char* student)
 	return -1;
 }
 
+//find the folder for an student mNr
+//"-1" if error occures
 char* getPath(char* mNr){
-    printf("GET PATH\n");
+    //printf("GET PATH\n");
     DIR *folder = opendir("./");
 	DIR *sfolder;
 	struct stat attribut;
 	struct dirent *mainfile;
 	struct dirent *subfile;
     static char ret[300] = "PATH NOT FOUND";
+    //traversel for folders
 	while((mainfile=readdir(folder))!=NULL){
 		stat(mainfile->d_name,&attribut);
 		if( attribut.st_mode & S_IFDIR){
 			char* name = mainfile->d_name;
+            //traversel for files -> ignoring . & git & ..
 			if(strcmp(name,".")!=0 && strcmp(name,"..")!=0 && strcmp(name,".git")!=0){
 				printf("DIR: %s\n",mainfile->d_name);
                 sfolder = opendir(mainfile->d_name);
@@ -117,7 +125,7 @@ char* getPath(char* mNr){
 					if(strcmp(subname,mNr)==0){
                         printf("%s/%s\n",mainfile->d_name,subfile->d_name);
                         sprintf(ret,"%s",mainfile->d_name);
-						printf("GET PATH DONE\n");
+						//printf("GET PATH DONE\n");
     					return ret;
 					}
 				}
@@ -175,11 +183,13 @@ void getSData(int fd)
    	}
 
 	char message[MAXDATASIZE];
+    //build message for client
 	sprintf(message,"\nMNR: %s\nPasswort: %s\nVorname: %s\nName: %s\nStudiengang: %s	\nGeburtstag: %s\n",student[1],student[2],student[3],student[4],student[5],student[6]);
 	sendMsg(fd, message);
 
 	if(countSemikolon < 7)
 	{
+        //waiting for socket flush -> praise 1s is enough
 		sleep(1);
 		sendMsg(fd, "0");
 	}
@@ -203,6 +213,7 @@ void getSData(int fd)
 		sleep(1);
 		sendMsg(fd, "0");
 	}			
+    //change folder to parent
    	chdir("..");
 }
 
@@ -216,7 +227,7 @@ void createGroup(int fd)
 		perror("mkdir\n");
 		sendMsg(fd,"Studiengang konnte nicht erstellt werden"); return;
 	}
-	printf("Group created\n");
+	printf("Group %s created\n",title);
 	sendMsg(fd,"Studiengang erfolreich erstellt");
 	return;
 }
@@ -235,6 +246,7 @@ int validateLogin(int fd)
 	int countSemikolon = 0;
 	char* input[MAXDATASIZE];
 
+    //token for incoming csv login
    	token = strtok(login, seps);	
 	while (token != NULL)
 	{
@@ -532,6 +544,7 @@ int addMark(int fd)
 	{	sendMsg(fd, "\nStudent existiert nicht.\n");}
 	return;
 }
+
 // Sends all groups to the client
 int showGroups(int fd) 
 {
@@ -545,7 +558,8 @@ int showGroups(int fd)
 	else
 	{
 		off_t pos;
-		char groups[MAXDATASIZE];//TODO: exakte Länge angeben?
+		char groups[MAXDATASIZE];
+
 		/* das komplette Verzeichnis auslesen */
 		while((dirzeiger=readdir(dir)) != NULL)
 		{	
@@ -570,7 +584,7 @@ int showGroups(int fd)
 // Sends all mNr of a group to the client
 int findGroup(int fd) 
 {
-	printf("find Group\n");
+	//printf("find Group\n");
 	int found = 0;
     char* directory;
     directory = recMsg(fd);
@@ -618,7 +632,7 @@ int findGroup(int fd)
 //creates a new Student in a given group directory
 int createStudent(int fd)
 {
-	printf("create Student\n");
+	//printf("create Student\n");
 	char* student;
 	student = recMsg(fd);
 	printf("StudentRec: %s \n",student);
@@ -804,6 +818,7 @@ int editStudent(int fd)
 	return;
 }
 
+//Menu-Loop
 void handleMenu(int fd)
 {
     char* auswahl;
@@ -843,11 +858,12 @@ void handleMenu(int fd)
         }
         if(strcmp(auswahl,"11")==0){
             getSData(fd);
-        }//TODO: return werte aller funktionen prüfen ob richtige zahl
+        }
     }
 }
 
 
+//main function for server init
 int main(int argc, char *argv[ ]){
 	/* later used for sock-conf */
 	int yes = 1;
@@ -935,12 +951,13 @@ int main(int argc, char *argv[ ]){
             printf("SOCKET Accept\n");
         }
         
+        //login 
         int valid = handleLogin(new_fd);
         if (valid==0){
             printf("UNVALID\n");
             while(valid==0){
                 valid = handleLogin(new_fd);
-                printf("VALID: %d\n",valid);
+                //printf("VALID: %d\n",valid);
             }
         } 
         if (valid==1){
