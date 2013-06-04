@@ -141,6 +141,12 @@ char* getPath(char* mNr){
 void getSData(int fd)
 {
 	char* mNr = recMsg(fd); // get searched student's mNr
+	char cwd[1024];
+       if (getcwd(cwd, sizeof(cwd)) != NULL)
+           fprintf(stdout, "Current working dir: %s\n", cwd);
+       else
+           perror("getcwd() error");
+
    	printf("Find mNr: %s\n",mNr);
    	char* path = getPath(mNr);
    	if(strcmp(path,"-1") == 0)
