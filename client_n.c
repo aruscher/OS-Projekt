@@ -44,7 +44,6 @@ char* manageLogin(int socket) {
     sprintf(message, "%s;%s", login, password);
     sendMsg(socket, message);
     rec=recMsg(socket);
-    printf("Rec after: %s\n", rec);
     if (strcmp(rec, "0")==0) {
         strcpy(rec, login);
     }
