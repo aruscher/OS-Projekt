@@ -417,19 +417,22 @@ void editStudent(int socket) {
 		system("clear");
 
 		return;
-	} else // Note ändern
+	} else // change mark
 	{
+		// get message if there are marks or not
 		rec = recMsg(socket);
 		if (strcmp(rec, "0") == 0) {
 			printf("Keine Noten vorhanden\n");
 			return;
 		}
-		printf("%s", rec); //Noten vorhanden
-		int counter = 1; //Anzahl der Noten
+		printf("%s", rec); //print first mark
+		int counter = 1; //counts the marks
+		// print every other mark
 		while (strcmp(rec = recMsg(socket), "0") != 0) {
 			printf("%s", rec);
 			counter++;
 		}
+		// get the choice which mark should be edited and the value
 		printf("---------------\n");
 		printf("Die wievielte Note wollen Sie ändern?\n");
 		printf(">");
@@ -451,6 +454,7 @@ void editStudent(int socket) {
 			system("clear");
 			return;
 		}
+		// Summary to be confirmed
 		printf("#############################\n");
 		printf("Für Student mit Mnr: %s Note %s zu %s ändern?\n", mNr, auswahl,
 				mark);
@@ -461,8 +465,8 @@ void editStudent(int socket) {
 			system("clear");
 			return;
 		}
-		sendMsg(socket, mark); //neue Note senden
-		rec = recMsg(socket);
+		sendMsg(socket, mark); //send new mark
+		rec = recMsg(socket); // get answer if editing was successfull
 		if (strcmp(rec, "0") == 0) {
 			printf("Fehler beim Editieren. Bitte versuche  Sie es erneut.\n");
 			printf("---------------\n");
@@ -498,21 +502,22 @@ void editStudent(int socket) {
 	return;
 }
 
-//findGroup Menu
+// Provides client-server-interaction to find all students in a specific group
 void findGroup(int socket) {
 	printf("Studiengangsmitglieder finden\n");
 	printf("---------------\n");
 	printf("0 für Beenden\n");
 	char title[MAXDATASIZE];
-	printf("Bitte geben Sie den gesuchten Studiengang an: >");
+	printf("Bitte geben Sie den gesuchten Studiengang an: >"); // get the group's name
 	scanf("%s", title);
 	if (strcmp(title, "0")==0) {
 		sendMsg(socket, "0");
 		return;
 	}
-	sendMsg(socket, title);
+	sendMsg(socket, title); // send the group's name
 	printf("Folgende Studenten enthalten:\n");
 	char* rec;
+	// print every student in the group
 	while (strcmp(rec = recMsg(socket), "0") != 0) {
 		printf("%s\n", rec);
 	}
@@ -531,7 +536,7 @@ void findGroup(int socket) {
 
 }
 
-//showGroups Menu
+// Provides client-server-interaction to show all existing groups
 void showGroups(int socket) {
 	printf("Studiengänge finden\n");
 	printf("---------------\n");
@@ -540,6 +545,7 @@ void showGroups(int socket) {
 	sendMsg(socket, "");
 	printf("Folgende Studiengänge enthalten:\n");
 	char* rec;
+	// print all existing groups
 	while (strcmp(rec = recMsg(socket), "0") != 0) {
 		printf("%s\n", rec);
 	}
@@ -557,12 +563,13 @@ void showGroups(int socket) {
 	system("clear");
 }
 
-//createGroup Menu
+// Provides client-server-interaction to create a new group
 void createGroup(int socket) {
 	printf("Studiengang anlegen\n");
 	printf("---------------\n");
 	printf("0 für Beenden\n");
 	char title[MAXDATASIZE];
+	// ask for the new group's name
 	printf("Bitte Titel eingeben: >");
 	scanf("%s", title);
 	if (strcmp(title, "0")==0) {
@@ -571,7 +578,7 @@ void createGroup(int socket) {
 	}
 	sendMsg(socket, title);
 	char* rec;
-	rec = recMsg(socket);
+	rec = recMsg(socket); // get answer if succesfull
 	printf("%s\n", rec);
 	printf("---------------\n");
 	printf("1 für Weiter\n");
@@ -588,7 +595,7 @@ void createGroup(int socket) {
 
 }
 
-//groupsBest Menu
+// Provides client-server-interaction to get a group's best student
 void groupsBest(int socket) {
 	printf("Studiengangsbesten anzeigen\n");
 	printf("---------------\n");
@@ -596,9 +603,9 @@ void groupsBest(int socket) {
 	char title[MAXDATASIZE];
 	printf("Bitte geben Sie den gesuchten Studiengang an: >");
 	scanf("%s", title);
-	sendMsg(socket, title);
+	sendMsg(socket, title); // send the searched group's name
 	char* rec;
-	rec = recMsg(socket);
+	rec = recMsg(socket); // get the best if exists
 	printf("%s\n", rec);
 	printf("---------------\n");
 	printf("1 für Weiter\n");
@@ -614,13 +621,13 @@ void groupsBest(int socket) {
 	system("clear");
 }
 
-//bestOfAll Menu
+// Provides client-server-interaction to get the best student of all
 void bestOfAll(int socket) {
 	printf("Gesamtbesten anzeigen\n");
 	printf("---------------\n");
 
 	char* rec;
-	rec = recMsg(socket);
+	rec = recMsg(socket); // get the best student if exists
 	printf("%s\n", rec);
 	printf("---------------\n");
 	printf("1 für Weiter\n");
@@ -640,6 +647,8 @@ void bestOfAll(int socket) {
 void exitProgramm() {
 	exit(0);
 }
+
+// the admin's menu
 char MainMenu(int socket) {
 	int option;
 	showMainMenu();
@@ -810,7 +819,7 @@ int main(int argc, char *argv[ ]) {
 		exit(1);
 	}
 
-	/* connect to server */
+	// connect to server
 	he = gethostbyname(argv[1]);
 	//get host by name of the given ip
 	if (he == NULL) {
