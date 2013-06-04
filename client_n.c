@@ -84,8 +84,8 @@ void showMainMenu() {
     printf("2)Student finden\n");
     printf("3)Student editieren\n");
     printf("4)Studiengang anlegen\n");
-    printf("5)Studiengang Mitglieder anzeigen\n");
-    printf("6)Studiengänge finden\n");
+    printf("5)Studiengangsmitglieder anzeigen\n");
+    printf("6)Studiengänge anzeigen\n");
     printf("7)Note hinzufügen\n");
     printf("8)Studiengangsbesten anzeigen\n");
     printf("9)Gesamtbesten anzeigen\n");
@@ -301,6 +301,7 @@ void addMark(int socket) {
     // Print message from server
     char* rec;
     rec = recMsg(socket);
+    printf("%s\n",rec);
     printf("---------------\n");
     printf("1 für Weiter\n");
     printf(">");
@@ -503,7 +504,7 @@ void editStudent(int socket) {
 
 // Provides client-server-interaction to find all students in a specific group
 void findGroup(int socket) {
-    printf("Studiengangsmitglieder finden\n");
+    printf("Studiengangsmitglieder anzeigen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
     char title[MAXDATASIZE];
@@ -518,7 +519,7 @@ void findGroup(int socket) {
     char* rec;
     // print every student in the group
     while (strcmp(rec = recMsg(socket), "0") != 0) {
-        printf("%s\n", rec);
+        printf("%s", rec);
     }
     printf("---------------\n");
     printf("1 für Weiter\n");
@@ -537,7 +538,7 @@ void findGroup(int socket) {
 
 // Provides client-server-interaction to show all existing groups
 void showGroups(int socket) {
-    printf("Studiengänge finden\n");
+    printf("Studiengänge anzeigen\n");
     printf("---------------\n");
     printf("0 für Beenden\n");
 
@@ -546,7 +547,7 @@ void showGroups(int socket) {
     char* rec;
     // print all existing groups
     while (strcmp(rec = recMsg(socket), "0") != 0) {
-        printf("%s\n", rec);
+        printf("%s", rec);
     }
     printf("---------------\n");
     printf("1 für Weiter\n");
