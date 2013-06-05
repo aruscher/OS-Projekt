@@ -339,6 +339,18 @@ void editStudent(int socket) {
     rec = recMsg(socket);
     if (strcmp(rec, "0") == 0) {
         printf("\nStudent nicht vorhanden\n");
+	printf("---------------\n");
+        printf("1 für Weiter\n");
+        printf(">");
+        char go[30];
+        scanf("%s", go);
+        while (strcmp(go, "1")!=0) {
+            printf("Ungültige Eingabe\n");
+            printf("1 für Weiter\n");
+            printf(">");
+            scanf("%s", go);
+        }
+        system("clear");
         return; //Cancel if student does not exist
     }
 
@@ -355,6 +367,7 @@ void editStudent(int socket) {
         scanf("%s", auswahl);
     }
     if (strcmp(auswahl, "0")==0) {
+	sendMsg(socket, "0");
         return;
     } //cancel
     sendMsg(socket, auswahl);
@@ -381,6 +394,7 @@ void editStudent(int socket) {
         printf(">");
         scanf("%s", auswahl);
         if (strcmp(auswahl, "0")==0) {
+	    sendMsg(socket, "0");
             system("clear");
             return;
         }
@@ -438,6 +452,7 @@ void editStudent(int socket) {
         printf(">");
         scanf("%s", auswahl);
         if (strcmp(auswahl, "0")==0) {
+	    sendMsg(socket, "0");
             return;
         }
         sendMsg(socket, auswahl);
@@ -462,6 +477,7 @@ void editStudent(int socket) {
         printf(">");
         scanf("%s", auswahl);
         if (strcmp(auswahl, "0")==0) {
+	    sendMsg(socket, "0");
             system("clear");
             return;
         }

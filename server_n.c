@@ -755,7 +755,7 @@ int editStudent(int fd)
 	
 		FILE *editFile = NULL;
 		if((editFile = fopen(mNr, "r")) == NULL) // can not open file
-		{	perror("fopen"); sendMsg(fd, "0"); return; }
+		{	perror("fopen"); sendMsg(fd, "0"); chdir(".."); return; }
 
 		//student exists, save student data
    		while((fscanf(editFile,"%500s",datenStudent)) != EOF)
@@ -780,9 +780,13 @@ int editStudent(int fd)
    		}
 		char* choice;
 		choice = recMsg(fd); // get answer if edit password or mark
+		if(strcmp(choice,"0") == 0) // Cancel
+		{	chdir(".."); return; }
 		if(strcmp(choice,"1") == 0) // edit password
 		{
 			choice = recMsg(fd); // get new password
+			if(strcmp(choice,"0") == 0) // Cancel
+			{	chdir(".."); return; }
 			input[2] = choice; // password on place 2
 		}
 		else //edit mark
@@ -801,8 +805,12 @@ int editStudent(int fd)
 				sleep(1);
 				sendMsg(fd, "0"); // end mark sending
 				choice = recMsg(fd); // get new number of mark
+				if(strcmp(choice,"0") == 0) // Cancel
+				{	chdir(".."); return; }
 				int count = atoi(choice)+6; // marks from place 7 till end
 				char* mark = recMsg(fd); // get new mark
+				if(strcmp(choice,"0") == 0) // Cancel
+				{	chdir(".."); return; }
 				if(count < 7 || count > countSemikolon) //wrong input
 				{	sendMsg(fd, "0"); chdir(".."); return; }
 				input[count] = mark; // save on the right place
